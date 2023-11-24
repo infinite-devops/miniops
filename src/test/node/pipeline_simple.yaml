@@ -1,0 +1,5 @@
+steps:
+  aaaa: 
+    script: dir /a /b
+  bbb: 
+    script: date /t
