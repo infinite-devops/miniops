@@ -21,7 +21,7 @@
  *   SOFTWARE.
  */
 
-require('../common/LoggerHelper.js');
+const logger = require('./Logger.js');
 
 function JavascriptHelper() {
 
@@ -35,10 +35,10 @@ function JavascriptHelper() {
       throw new Error("function content is required");
     }
 
-    console.debug("code")
-    console.debug(functionString);
-    console.debug("variables")
-    console.debug(variables)
+    logger.debug("code")
+    logger.debug(functionString);
+    logger.debug("variables")
+    logger.debug(variables)
 
     //create an array of variable names and at the end, the script
     //https://stackoverflow.com/a/4183662/3957754

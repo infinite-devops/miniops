@@ -21,6 +21,7 @@
  *   SOFTWARE.
  */
 
+const logger = require('../../../main/node/common/Logger.js');
 const os = require('os');
 var chai = require('chai');
 const path = require('path');
@@ -47,7 +48,7 @@ describe('DevopsTask', function() {
     var devopsTask = new DevopsTask(shellHelperMock, pipelineMock);
 
     var response = await devopsTask.start("foo/bar.git", uuidv4(), "/some/unicorn.yaml");
-    console.log(response)
+    logger.info(response)
     expect(response.changed).to.equal(true);
     expect(response.stdout).to.equal("foo");
   });

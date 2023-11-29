@@ -1,10 +1,10 @@
 # Miniops
 
 <p float="left">
-  <img src="./.coverage/branches.svg">
-  <img src="./.coverage/functions.svg">
-  <img src="./.coverage/lines.svg">
-  <img src="./.coverage/statements.svg">
+  <img src="./coverage/branches.svg">
+  <img src="./coverage/functions.svg">
+  <img src="./coverage/lines.svg">
+  <img src="./coverage/statements.svg">
 </p>
 
 

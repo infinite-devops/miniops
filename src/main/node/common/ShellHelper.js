@@ -21,7 +21,7 @@
  *   SOFTWARE.
  */
 
-require('../common/LoggerHelper.js');
+const logger = require('./Logger.js');
 const exec = require('child_process').exec;
 const fs = require('fs');
 const path = require('path');
@@ -32,10 +32,10 @@ const { v4: uuidv4 } = require('uuid');
 function ShellHelper() {
 
     this.executeSingleLine = async (rawStatement, variables) => {
-        console.debug("script")
-        console.debug(rawStatement)
-        console.debug("variables");
-        console.debug(variables);
+        logger.debug("script")
+        logger.debug(rawStatement)
+        logger.debug("variables");
+        logger.debug(variables);
 
         return new Promise(function (resolve, reject) {
             var rawCommands = rawStatement.trim();
@@ -59,15 +59,15 @@ function ShellHelper() {
     }
 
     this.executeSeveralLines = async (rawStatement, variables) => {
-        console.debug("script")
-        console.debug(rawStatement)        
-        console.debug("variables");
-        console.debug(variables);
+        logger.debug("script")
+        logger.debug(rawStatement)        
+        logger.debug("variables");
+        logger.debug(variables);
         return new Promise(async function (resolve, reject) {
 
             var extension = os.platform == 'win32' ? ".bat" : ".sh";
             const tempFile = path.join(os.tmpdir(), uuidv4() + extension)
-            console.log(tempFile)
+            logger.info(tempFile)
             await fs.promises.writeFile(tempFile, rawStatement.trim());    
             //fix Error: spawn /tmp/bdd737d0-f126-49d0-9916-4deb2aed7ffa.sh EACCES        
             if(os.platform()!=="win32"){
@@ -132,7 +132,7 @@ function ShellHelper() {
     function deleteFile(location) {
         fs.unlink(location, (err) => {
             if (err) throw err;
-            console.log('successfully deleted: ' + location);
+            logger.info('successfully deleted: ' + location);
         });
     }
 

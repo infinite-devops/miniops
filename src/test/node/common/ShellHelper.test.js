@@ -1,4 +1,4 @@
-require('../../../main/node/common/LoggerHelper.js');
+const logger = require('../../../main/node/common/Logger.js');
 var os = require('os');
 var chai = require('chai');
 var expect = chai.expect;var assert = chai.assert;
@@ -22,19 +22,19 @@ describe('ShellHelper', function() {
     if(os.platform()==="win32"){
       try{
         var rawStatus = await shellHelper.executeSingleLine(`%systemroot%/system32/inetsrv/appcmd list site /name:"unmundosincsharp"`);
-        console.log(rawStatus)
+        logger.info(rawStatus)
         status = /state:[^\)]+/.exec(rawStatus.stdout)[0].split(":")[1]
       }catch(err){
-        console.log(err)
+        logger.info(err)
         status="unknown"
       }
       if(status=="Started"){
         var response = await shellHelper.executeSingleLine(`%systemroot%/system32/inetsrv/appcmd stop site /site.name:unmundosincsharp`);
-        console.log(response)
+        logger.info(response)
         expect(response.stdout.includes("successfully stopped")).to.equal(true);
       }
     }else if(os.platform()==="linux"){
-      console.debug("coming soon")
+      logger.debug("coming soon")
     }
   });
 
@@ -43,11 +43,11 @@ describe('ShellHelper', function() {
 
     if(os.platform()==="win32"){
       var response = await shellHelper.executeSeveralLines(`ipconfig | findstr /i "ipv4"`);
-      console.log(response)
+      logger.info(response)
       expect(response.stdout.includes("192.168")).to.equal(true);
     }else if(os.platform()==="linux"){
       var response = await shellHelper.executeSeveralLines(`hostname -I`);
-      console.log(response)
+      logger.info(response)
       expect(response.stdout.includes("192.168")).to.equal(true);
     }  
 
@@ -60,14 +60,14 @@ describe('ShellHelper', function() {
       date /t 
       ipconfig | findstr /i "ipv4"
       `);
-      console.log(response)
+      logger.info(response)
       expect(response.stdout.includes("192.168")).to.equal(true);        
     }else if(os.platform()==="linux"){
       var response = await shellHelper.executeSeveralLines(`
       ls -la
       hostname -I
       `);
-      console.log(response)
+      logger.info(response)
       expect(response.stdout.includes("192.168")).to.equal(true);
     }
   });

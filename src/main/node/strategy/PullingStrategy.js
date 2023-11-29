@@ -46,18 +46,18 @@ function PullingStrategy(){
         
         const job = schedule.scheduleJob('*/15 * * * * *', async function(){
             
-            console.log('\n\nrunning job every 15 seconds');
+            logger.info('\n\nrunning job every 15 seconds');
             var tinyDevopsStatusLocation = path.join(process.env.INIT_CWD, "tiny-devops.txt")
             var tinyDevopsStatus;
             try {
                 tinyDevopsStatus = await fs.promises.readFile(tinyDevopsStatusLocation, "utf-8");
             }
             catch (e) {
-                console.debug(e);
+                logger.debug(e);
             }
         
             if(tinyDevopsStatus==="in-progress"){
-                console.log("Another job is in progress")
+                logger.info("Another job is in progress")
                 return;
             }
             
@@ -77,7 +77,7 @@ function PullingStrategy(){
                 throw e;
             }
         
-            console.log("completed")
+            logger.info("completed")
         });
         
         app.listen(process.env.PORT || 9000);
