@@ -1,0 +1,5 @@
+steps:
+  aaaa: 
+    script: foo
+  bbb: 
+    script: date /t

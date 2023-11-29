@@ -4,17 +4,21 @@
   "description": "meta-js framework",
   "main": "src/main/Index.js",
   "scripts": {
+    "start": "node src\\main\\node\\PullingStrategy.js",
+    "init": "pm2 start --name devops src\\main\\node\\PullingStrategy.js",
     "test": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit --require mocha-suppress-logs && npm run badges",
-    "test:verbose": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit && npm run badges",
+    "test:verbose": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit  --timeout 100000 && npm run badges",
     "badges": "badges4cov --source=nyc_json --nyc_json_file_location=./coverage/coverage-summary.json --output_folder=./coverage"
   },
   "author": "JRichardsz <jrichardsz.java@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "core-js": "3.6.5",
+    "express": "^4.18.2",
     "js-yaml": "^4.1.0",
+    "node-cron": "^3.0.3",
+    "node-schedule": "^2.1.1",
     "sinon": "^17.0.1",
-    "tmp-promise": "^3.0.3",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

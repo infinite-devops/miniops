@@ -1,23 +1,27 @@
+require('../common/LoggerHelper.js');
 const exec = require('child_process').exec;
 const fs = require('fs');
 const path = require('path');
-const execFile = require('child_process').execFile;
 const os = require('os');
 const { spawn } = require('child_process');
-const { file } = require('tmp-promise');
 const { v4: uuidv4 } = require('uuid');
 
 function ShellHelper() {
 
-    this.executeSingleLine = async (rawStatement) => {
+    this.executeSingleLine = async (rawStatement, variables) => {
+        console.debug("script")
+        console.debug(rawStatement)
+        console.debug("variables");
+        console.debug(variables);
+
         return new Promise(function (resolve, reject) {
             var rawCommands = rawStatement.trim();
 
             var code;
-            instance = exec(rawCommands, { shell: true }, (err, stdout, stderr) => {
+            instance = exec(rawCommands, { shell: true, env: variables, windowsHide:true }, (err, stdout, stderr) => {
                 if (err) {
                     var stackTrace = err.toString();
-                    return reject({ code, stdout, stderr, stackTrace });
+                    return reject({ code, stdout, stderr, stackTrace, fullStackTraceErr: err });
                 } else {
                     resolve({ code, stdout, stderr });
                 }
@@ -31,7 +35,11 @@ function ShellHelper() {
 
     }
 
-    this.executeSeveralLines = async (rawStatement) => {
+    this.executeSeveralLines = async (rawStatement, variables) => {
+        console.debug("script")
+        console.debug(rawStatement)        
+        console.debug("variables");
+        console.debug(variables);
         return new Promise(async function (resolve, reject) {
 
             var extension = os.platform == 'win32' ? ".bat" : ".sh";
@@ -39,7 +47,7 @@ function ShellHelper() {
             console.log(tempFile)
             await fs.promises.writeFile(tempFile, rawStatement.trim());
 
-            const process = spawn(tempFile, []);
+            const process = spawn(tempFile, [], { env: variables, windowsHide:true });
 
             // You can also use a variable to save the output 
             // for when the script closes later
@@ -56,7 +64,8 @@ function ShellHelper() {
             process.stderr.setEncoding('utf8');
             process.stderr.on('data', function (data) {
                 //Here is where the error output goes
-                stderrCollection.push(data.toString());
+                var rawString = data.toString();
+                stderrCollection.push(rawString);
             });
             process.on('error', function (err) {
                 // *** Process creation failed
@@ -73,7 +82,7 @@ function ShellHelper() {
                     stderr = stderrCollection.join("\n");
                 } 
 
-                reject({ code, stdout, stderr, stackTrace, rawPayload });
+                reject({ code, stdout, stderr, stackTrace, rawPayload, fullStackTraceErr: err });
             });
             process.on('close', function (code) { // Should probably be 'exit', not 'close'
                 // *** Process completed

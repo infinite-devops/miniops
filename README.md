@@ -1,80 +1,69 @@
-# Meta JS
+# Tiny Devops
 
-![](./coverage/lines.svg) ![](./coverage/statements.svg) ![](./coverage/branches.svg) ![](./coverage/functions.svg)
+<p float="left">
+  <img src="./.coverage/branches.svg">
+  <img src="./.coverage/functions.svg">
+  <img src="./.coverage/lines.svg">
+  <img src="./.coverage/statements.svg">
+</p>
 
-meta features for nodejs inspired on java and spring boot framework
+A little buddy to help you inyour devops process
 
-## Features
+## requirements
 
-- @annotations like java does
+- Nodejs
+  - For windows users https://nodejs.org/en/download
+  - For linux users I don't need to explain it
 
-## How it works?
-
-- Create a nodejs javascript class with annotations:
+- Pm2
 
 ```
-@Foo
-function SomeClass(){
-
-  @Baz
-  this.someVariable;
-
-  @Bar(path="/countries")
-  this.someMethod = (req, res) => {
-    res.json(this.companies);
-  }
-}
-
-module.exports = SomeClass;
-```
-- Use meta to get the dependencies at:
-  - class level
-  - method level
-  - variables
-
-## Usage
-
-**require**
-```
-const NodeInternalModulesHook = require('meta-js').NodeInternalModulesHook;
-NodeInternalModulesHook._compile();// removes the @ at runtime
-const DependencyHelper = require('meta-js').DependencyHelper;
+npm install -g pm2
 ```
 
-**get dependencies**
+- Validate the pm2
+
 ```
-var dependencies;
-var environment = process.env.NODE_ENV
-if (environment !== 'production') {
-  var headAnnotations = ["Config", "Route", "Middleware", "ServerInitializer", "Service"];
-  var internalAnnotations = ["Autowire", "Get", "Post", "Put", "Delete", "Configuration", "Protected"];
-  dependencies = DependencyHelper.getDependecies(applicationRootLocation, [".js"], ["src/main/Index.js", ".test.js"], headAnnotations, internalAnnotations);
-  console.log(JSON.stringify(dependencies, null, 4));
-  await fsPromises.writeFile('meta.json', JSON.stringify(dependencies), 'utf8');
-} else {
-  dependencies = await fsPromises.readFile('meta.json', 'utf8')
-}
+pm2 --version
 ```
 
-**dependencies** has information about all module dependencies and its relations. You could use this json to instantatiate acorde to your needs.
+- Clone this repository
 
-# Road map
+## Run
 
-- Improve the comments of annotations of src/main/org/metajs/hook/NodeInternalModulesHook.js
-- Refactor to be exactly as Java Annotations framework
+```
+set GIT_URL=http://192.168.0.66:6000/asp-wacala.git
+set GIT_BRANCH=develop
+set YAML_LOCATION=C:\foo\bar\real_001.yaml
+npm run init
+```
 
-# Contributors
+## Logs
+
+```
+pm2 logs devops
+```
+
+## Delete
+
+```
+pm2 delete devops
+```
+
+## References
+
+https://betterstack.com/community/guides/scaling-nodejs/pm2-guide/
+
+
+## Contributors
 
 <table>
-  <tbody>
+  <tbody>    
     <td>
       <img src="https://avatars0.githubusercontent.com/u/3322836?s=460&v=4" width="100px;"/>
       <br />
-      <label><a href="http://jrichardsz.github.io/">Richard Leon</a></label>
+      <label><a href="http://jrichardsz.github.io/">JRichardsz</a></label>
       <br />
-    </td>    
+    </td>
   </tbody>
 </table>
-
-# Since
-- 2018

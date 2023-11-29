@@ -1,6 +1,13 @@
 **/.DS_Store
 /node_modules
 /dist
-coverage
 .nyc_output
 nohup.out
+tiny-devops.txt
+
+
+/.coverage/*
+!/.coverage/branches.svg
+!/.coverage/functions.svg
+!/.coverage/lines.svg
+!/.coverage/statements.svg
