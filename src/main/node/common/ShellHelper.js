@@ -68,8 +68,11 @@ function ShellHelper() {
             var extension = os.platform == 'win32' ? ".bat" : ".sh";
             const tempFile = path.join(os.tmpdir(), uuidv4() + extension)
             console.log(tempFile)
-            await fs.promises.writeFile(tempFile, rawStatement.trim());
-
+            await fs.promises.writeFile(tempFile, rawStatement.trim());    
+            //fix Error: spawn /tmp/bdd737d0-f126-49d0-9916-4deb2aed7ffa.sh EACCES        
+            if(os.platform()!=="win32"){
+                await fs.promises.chmod(tempFile, "755");
+            }
             const process = spawn(tempFile, [], { env: variables, windowsHide:true });
 
             // You can also use a variable to save the output 
@@ -104,10 +107,10 @@ function ShellHelper() {
                 if(stderrCollection.length>0){
                     stderr = stderrCollection.join("\n");
                 } 
-
+                var code = err.errno;
                 reject({ code, stdout, stderr, stackTrace, rawPayload, fullStackTraceErr: err });
             });
-            process.on('close', function (code) { // Should probably be 'exit', not 'close'
+            process.on('close', function (code) { // Should probably be 'exit', not 'close'                
                 // *** Process completed
                 deleteFile(tempFile);
                 var stdout, stderr, rawPayload;

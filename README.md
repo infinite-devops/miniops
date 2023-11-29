@@ -1,4 +1,4 @@
-# Tiny Devops
+# Miniops
 
 <p float="left">
   <img src="./.coverage/branches.svg">
@@ -7,13 +7,26 @@
   <img src="./.coverage/statements.svg">
 </p>
 
-A little buddy to help you inyour devops process
+
+<p style="text-align:center">
+  <img src="./.assets/logo.png" width=200 ></img>
+</p>
+
+
+
+A little and friendly buddy to help you in your devops automations.
 
 ## requirements
 
 - Nodejs
   - For windows users https://nodejs.org/en/download
   - For linux users I don't need to explain it
+
+- miniops tool
+
+```
+npm install usil/tiny-devops#1.0.0-snapshot
+```
 
 - Pm2
 
@@ -54,6 +67,10 @@ pm2 delete devops
 
 https://betterstack.com/community/guides/scaling-nodejs/pm2-guide/
 
+
+## Acknowledgments
+
+- https://easydrawingguides.com/how-to-draw-bob-the-minion/
 
 ## Contributors
 

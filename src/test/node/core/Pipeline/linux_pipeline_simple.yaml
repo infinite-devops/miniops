@@ -1,0 +1,5 @@
+steps:
+  aaaa: 
+    script: ls -la
+  bbb: 
+    script: date

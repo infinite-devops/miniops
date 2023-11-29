@@ -1,0 +1,9 @@
+steps:
+  aaaa: 
+    script: |
+      echo 
+      echo foo=bar
+  bbb: 
+    script: |
+      echo
+      echo baz=$foo

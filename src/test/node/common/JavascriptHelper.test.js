@@ -1,7 +1,5 @@
 var chai = require('chai');
-const fsPromises = require('fs').promises
 var expect = chai.expect;
-var assert = chai.assert;
 var JavascriptHelper = require('../../../main/node/common/JavascriptHelper.js');
 
 describe('JavascriptHelper : executeSingleFunction', function() {

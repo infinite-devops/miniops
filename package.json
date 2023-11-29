@@ -3,6 +3,9 @@
   "version": "1.0.6",
   "description": "meta-js framework",
   "main": "src/main/Index.js",
+  "bin": {
+    "miniops": "src/index.js"
+  },
   "scripts": {
     "start": "node src\\main\\node\\PullingStrategy.js",
     "init": "pm2 start --name devops src\\main\\node\\PullingStrategy.js",
@@ -13,6 +16,7 @@
   "author": "JRichardsz <jrichardsz.java@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "args-parser": "^1.3.0",
     "core-js": "3.6.5",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",

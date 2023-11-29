@@ -21,9 +21,7 @@
  *   SOFTWARE.
  */
 
-const { exec } = require('child_process')
-const util = require('util')
-const execute = util.promisify(exec);
+require('../common/LoggerHelper.js');
 
 function JavascriptHelper() {
 
