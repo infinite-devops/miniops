@@ -1,14 +1,14 @@
 {
-  "name": "meta-js",
-  "version": "1.0.6",
-  "description": "meta-js framework",
+  "name": "miniops",
+  "version": "1.0.0",
+  "description": "miniops",
   "main": "src/main/Index.js",
   "bin": {
     "miniops": "src/index.js"
   },
   "scripts": {
-    "start": "node src\\main\\node\\PullingStrategy.js",
-    "init": "pm2 start --name devops src\\main\\node\\PullingStrategy.js",
+    "start:pulling": "node src/main/node/Index.js --mode=pulling",
+    "pm2:pulling": "pm2 start --name miniops src/main/node/Index.js -- --mode=pulling",
     "test": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit --require mocha-suppress-logs && npm run badges",
     "test:verbose": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit  --timeout 100000 && npm run badges",
     "badges": "badges4cov --source=nyc_json --nyc_json_file_location=./coverage/coverage-summary.json --output_folder=./coverage"
@@ -20,9 +20,7 @@
     "core-js": "3.6.5",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
-    "node-cron": "^3.0.3",
     "node-schedule": "^2.1.1",
-    "sinon": "^17.0.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

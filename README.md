@@ -25,42 +25,40 @@ A little and friendly buddy to help you in your devops automations.
 - miniops tool
 
 ```
-npm install usil/tiny-devops#1.0.0-snapshot
-```
-
-- Pm2
-
-```
 npm install -g pm2
+npm install -g usil/miniops#1.0.0-snapshot
 ```
 
-- Validate the pm2
+## Run - Windows
 
 ```
-pm2 --version
+set cron_expression="'*/15 * * * * *'"
+set git_url=http://192.168.0.66:6000/asp-wacala.git
+set git_branch=develop
+set yaml_location=C:\foo\bar\real_001.yaml
+miniops --mode=pulling
 ```
 
-- Clone this repository
-
-## Run
+## Run - Linux
 
 ```
-set GIT_URL=http://192.168.0.66:6000/asp-wacala.git
-set GIT_BRANCH=develop
-set YAML_LOCATION=C:\foo\bar\real_001.yaml
-npm run init
+export cron_expression="'*/15 * * * * *'"
+export git_url=http://192.168.0.66:6000/asp-wacala.git
+export git_branch=develop
+export yaml_location=C:\foo\bar\real_001.yaml
+miniops --mode=pulling
 ```
 
 ## Logs
 
 ```
-pm2 logs devops
+pm2 logs miniops
 ```
 
 ## Delete
 
 ```
-pm2 delete devops
+pm2 delete miniops
 ```
 
 ## References
