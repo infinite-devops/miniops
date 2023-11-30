@@ -25,7 +25,6 @@ const logger = require('../../../main/node/common/Logger.js');
 const os = require('os');
 var chai = require('chai');
 const path = require('path');
-const sinon = require('sinon');
 var expect = chai.expect;var assert = chai.assert;
 var DevopsTask = require('../../../main/node/core/DevopsTask.js');
 const ShellHelper = require('../../../main/node/common/ShellHelper.js');

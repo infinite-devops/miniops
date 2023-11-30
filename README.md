@@ -22,31 +22,38 @@ A little and friendly buddy to help you in your devops automations.
   - For windows users https://nodejs.org/en/download
   - For linux users I don't need to explain it
 
-- miniops tool
+- pm2
 
 ```
 npm install -g pm2
-npm install -g usil/miniops#1.0.0-snapshot
+```
+
+- miniops tool
+
+```
+git clone https://github.com/usil/miniops.git -b 1.0.0-snapshot
 ```
 
 ## Run - Windows
 
 ```
-set cron_expression="'*/15 * * * * *'"
-set git_url=http://192.168.0.66:6000/asp-wacala.git
+set cron_expression=*/15 * * * * *
+set git_url=http://192.168.0.66:6000/asp-xit.git
 set git_branch=develop
-set yaml_location=C:\foo\bar\real_001.yaml
-miniops --mode=pulling
+set yaml_location=C:\foo\bar\acme.yaml
+
+npm run pm2:pulling
 ```
 
 ## Run - Linux
 
 ```
-export cron_expression="'*/15 * * * * *'"
-export git_url=http://192.168.0.66:6000/asp-wacala.git
+export cron_expression="*/15 * * * * *"
+export git_url=http://192.168.0.66:6000/acme.git
 export git_branch=develop
-export yaml_location=C:\foo\bar\real_001.yaml
-miniops --mode=pulling
+export yaml_location=/foo/bar/acme.yaml
+
+npm run pm2:pulling
 ```
 
 ## Logs

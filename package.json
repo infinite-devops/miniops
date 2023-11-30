@@ -7,8 +7,8 @@
     "miniops": "src/index.js"
   },
   "scripts": {
-    "start:pulling": "node src/main/node/Index.js --mode=pulling",
-    "pm2:pulling": "pm2 start --name miniops src/main/node/Index.js -- --mode=pulling",
+    "start:pulling": "node src/main/node/Index.js --mode=polling",
+    "pm2:pulling": "pm2 start --name miniops src/main/node/Index.js -- --mode=polling",
     "test": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit --require mocha-suppress-logs && npm run badges",
     "test:verbose": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit  --timeout 100000 && npm run badges",
     "badges": "badges4cov --source=nyc_json --nyc_json_file_location=./coverage/coverage-summary.json --output_folder=./coverage"

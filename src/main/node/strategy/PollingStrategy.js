@@ -21,7 +21,7 @@
  *   SOFTWARE.
  */
 
-const logger = require('../common/LoggerHelper.js');
+const logger = require('../common/Logger.js');
 const DevopsTask = require('../core/DevopsTask.js');
 const ShellHelper = require('../common/ShellHelper.js');
 const Pipeline = require('../core/Pipeline.js');
