@@ -59,6 +59,7 @@ npm run pm2:polling
 ## Logs
 
 ```
+pm2 flush miniops
 pm2 logs miniops
 ```
 
@@ -67,6 +68,19 @@ pm2 logs miniops
 ```
 pm2 delete miniops
 ```
+
+## Update
+
+To try another version:
+
+- delete it
+
+```
+pm2 delete miniops
+```
+
+- clone or pull
+- start again
 
 ## References
 
