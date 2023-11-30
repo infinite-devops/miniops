@@ -8,7 +8,7 @@
 </p>
 
 
-<p style="text-align:center">
+<p align="center">
   <img src="./.assets/logo.png" width=200 ></img>
 </p>
 
@@ -76,6 +76,7 @@ https://betterstack.com/community/guides/scaling-nodejs/pm2-guide/
 ## Acknowledgments
 
 - https://easydrawingguides.com/how-to-draw-bob-the-minion/
+- https://www.textstudio.com/logo/minions-411
 
 ## Contributors
 
