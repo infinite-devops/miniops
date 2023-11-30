@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const args = require("args-parser")(process.argv)
-const logger = require('../common/Logger.js');
+const logger = require('./common/Logger.js');
 const PullingStrategy = require("./strategy/PollingStrategy.js")
 
 logger.info("arguments")
