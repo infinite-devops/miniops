@@ -29,7 +29,8 @@ const schedule = require('node-schedule');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-var express = require('express');
+const { v4: uuidv4 } = require('uuid');
+const express = require('express');
 
 function PullingStrategy(){
 
@@ -65,7 +66,7 @@ function PullingStrategy(){
         var devopsTask = new DevopsTask(shellHelper, pipeline);
         
         const job = schedule.scheduleJob(params.cron_expression, async function(){
-            
+            var uuidExecution = uuidv4();
             var miniopsStatusLocation = path.join(os.tmpdir(), "miniops.txt")
             var miniopsStatus;
             try {
@@ -80,16 +81,27 @@ function PullingStrategy(){
                 return;
             }
 
-            logger.info('\nStarting job');
+            logger.info('\nStarting job: '+uuidExecution);
             
             try {
                 await fs.promises.writeFile(miniopsStatusLocation, "in-progress");
             }
-            catch (e) {
-                throw e;
+            catch (error) {
+                logger.error(error); 
+                logger.info("failed: "+uuidExecution)
+                await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                return;
             }
         
-            var response = await devopsTask.start(params.git_url, params.git_branch, params.yaml_location);  
+            response = await devopsTask.start(params.git_url, params.git_branch, params.yaml_location);  
+            try {
+                response = await devopsTask.start(params.git_url, params.git_branch, params.yaml_location);  
+            } catch (error) {
+                logger.error(error); 
+                logger.info("failed: "+uuidExecution)
+                await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                return;
+            }
         
             try {
                 await fs.promises.writeFile(miniopsStatusLocation, response.code==0?"completed": "failed");
@@ -98,7 +110,7 @@ function PullingStrategy(){
                 throw e;
             }
         
-            logger.info("completed")
+            logger.info("completed: "+uuidExecution)
         });
         
         app.listen(process.env.PORT || 9000);
