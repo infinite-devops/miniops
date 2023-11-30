@@ -34,6 +34,25 @@ var express = require('express');
 function PullingStrategy(){
 
     this.start = async(params) => {
+
+        logger.info("PullingStrategy params")
+        logger.info(params)
+
+        if(typeof params.git_url === 'undefined'){
+            logger.error("git_url parameter is required")
+            return;
+        }
+
+        if(typeof params.git_branch === 'undefined'){
+            logger.error("git_branch parameter is required")
+            return;
+        }
+        
+        if(typeof params.yaml_location === 'undefined'){
+            logger.error("yaml_location parameter is required")
+            return;
+        }
+
         var app = express();
 
         app.get('/health', function(req, res) {
@@ -47,7 +66,6 @@ function PullingStrategy(){
         
         const job = schedule.scheduleJob(params.cron_expression, async function(){
             
-            logger.info('\n\Starting job');
             var miniopsStatusLocation = path.join(os.tmpdir(), "miniops.txt")
             var miniopsStatus;
             try {
@@ -61,6 +79,8 @@ function PullingStrategy(){
                 logger.info("Another job is in progress")
                 return;
             }
+
+            logger.info('\nStarting job');
             
             try {
                 await fs.promises.writeFile(miniopsStatusLocation, "in-progress");

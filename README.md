@@ -42,7 +42,7 @@ set git_url=http://192.168.0.66:6000/asp-xit.git
 set git_branch=develop
 set yaml_location=C:\foo\bar\acme.yaml
 
-npm run pm2:pulling
+npm run pm2:polling
 ```
 
 ## Run - Linux
@@ -53,7 +53,7 @@ export git_url=http://192.168.0.66:6000/acme.git
 export git_branch=develop
 export yaml_location=/foo/bar/acme.yaml
 
-npm run pm2:pulling
+npm run pm2:polling
 ```
 
 ## Logs

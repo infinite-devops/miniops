@@ -1,7 +1,16 @@
 #!/usr/bin/env node
 
 const args = require("args-parser")(process.argv)
+const logger = require('../common/Logger.js');
 const PullingStrategy = require("./strategy/PollingStrategy.js")
+
+logger.info("arguments")
+logger.info(args)
+
+if(typeof args.mode === 'undefined'){
+    logger.error(args)
+    return;
+}
 
 if(args.mode==="polling") {
     var pullingStrategy= new PullingStrategy();

@@ -43,6 +43,16 @@ Logger.debug = (message) => {
     }
 }
 
+Logger.error = (message) => {
+    var dateString = getCurrentDateFormat();
+    if(typeof message === 'string'){
+        console.error(`${dateString} ERROR - ${message}`);
+    }else{
+        console.error(`${dateString} ERROR - `, message);
+    }
+    
+}
+
 const getCurrentDateFormat = function() {
     return (new Date()).toLocaleString();;
 };
