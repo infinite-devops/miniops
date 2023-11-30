@@ -81,7 +81,8 @@ function PullingStrategy(){
                 return;
             }
 
-            logger.info('\nStarting job: '+uuidExecution);
+            logger.info('\n');
+            logger.info('Starting job: '+uuidExecution);
             
             try {
                 await fs.promises.writeFile(miniopsStatusLocation, "in-progress");
@@ -93,7 +94,6 @@ function PullingStrategy(){
                 return;
             }
         
-            response = await devopsTask.start(params.git_url, params.git_branch, params.yaml_location);  
             try {
                 response = await devopsTask.start(params.git_url, params.git_branch, params.yaml_location);  
             } catch (error) {
@@ -106,8 +106,11 @@ function PullingStrategy(){
             try {
                 await fs.promises.writeFile(miniopsStatusLocation, response.code==0?"completed": "failed");
             }
-            catch (e) {
-                throw e;
+            catch (error) {
+                logger.error(error); 
+                logger.info("failed: "+uuidExecution)
+                await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                return;
             }
         
             logger.info("completed: "+uuidExecution)
