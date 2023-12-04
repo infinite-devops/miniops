@@ -25,7 +25,8 @@ A little and friendly buddy to help you in your devops automations.
   - For linux users I don't need to explain it
 
 - SSH for git
-  - COnfigure the ss keys of your favourite git platform (github, bitbucket, gitlab, etc)
+  - Configure the ssh keys of your favourite git platform (github, bitbucket, gitlab, etc). Check [this](https://gist.github.com/jrichardsz/cfed8ee22ac89c04b6e85cb84dd66617)
+  - For windows, I advice you the [pageant.exe](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
 
 - Nodejs
   - For windows users https://nodejs.org/en/download
