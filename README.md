@@ -18,6 +18,15 @@ A little and friendly buddy to help you in your devops automations.
 
 ## requirements
 
+- A  hello world  of your favourite language in a git repository
+
+- Git
+  - For windows users https://git-scm.com/download/win
+  - For linux users I don't need to explain it
+
+- SSH for git
+  - COnfigure the ss keys of your favourite git platform (github, bitbucket, gitlab, etc)
+
 - Nodejs
   - For windows users https://nodejs.org/en/download
   - For linux users I don't need to explain it
@@ -34,14 +43,22 @@ npm install -g pm2
 git clone https://github.com/usil/miniops.git -b 1.0.0-snapshot
 ```
 
+## Yaml
+
+Similar to the yaml of gitlab, bitbucket, github actions, etc we need to create a valid yaml. You could use one of these
+
+https://github.com/usil/miniops/wiki/Yaml-templates_
+
+
 ## Run - Windows
 
 ```
 set cron_expression=*/15 * * * * *
-set git_url=http://192.168.0.66:6000/asp-xit.git
+set git_url=https://github.com/usil/asp-classic-hello-world.git
 set git_branch=develop
 set yaml_location=C:\foo\bar\acme.yaml
 
+npm install
 npm run pm2:polling
 ```
 
@@ -49,10 +66,11 @@ npm run pm2:polling
 
 ```
 export cron_expression="*/15 * * * * *"
-export git_url=http://192.168.0.66:6000/acme.git
+export git_url=https://github.com/foo/java-web-hello-world.git
 export git_branch=develop
 export yaml_location=/foo/bar/acme.yaml
 
+npm install
 npm run pm2:polling
 ```
 
