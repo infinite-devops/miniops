@@ -48,7 +48,7 @@ git clone https://github.com/usil/miniops.git -b 1.0.0-snapshot
 
 Similar to the yaml of gitlab, bitbucket, github actions, etc we need to create a valid yaml. You could use one of these
 
-https://github.com/usil/miniops/wiki/Yaml-templates_
+[Yaml-templates_](https://github.com/usil/miniops/wiki/Yaml-templates_)
 
 
 ## Run - Windows
