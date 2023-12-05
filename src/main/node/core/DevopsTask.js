@@ -80,8 +80,16 @@ function DevopsTask(shellHelper, pipeline) {
             logger.debug(e);
         }
 
+        deleteFile(workspaceFullLocation)
         return {...response, changed: true}
     };
+
+    function deleteFile(location) {
+        fs.unlink(location, (err) => {
+            if (err) throw err;
+            logger.info('successfully deleted: ' + location);
+        });
+    }    
 
 }
 

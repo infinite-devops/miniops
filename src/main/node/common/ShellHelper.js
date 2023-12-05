@@ -41,7 +41,7 @@ function ShellHelper() {
             var rawCommands = rawStatement.trim();
 
             var code;
-            instance = exec(rawCommands, { shell: true, env: variables, windowsHide:true }, (err, stdout, stderr) => {
+            instance = exec(rawCommands, { shell: true, env: {...process.env, ...variables}, windowsHide:true }, (err, stdout, stderr) => {
                 if (err) {
                     var stackTrace = err.toString();
                     return reject({ code, stdout, stderr, stackTrace, fullStackTraceErr: err });
@@ -73,27 +73,27 @@ function ShellHelper() {
             if(os.platform()!=="win32"){
                 await fs.promises.chmod(tempFile, "755");
             }
-            const process = spawn(tempFile, [], { env: variables, windowsHide:true });
+            const _process = spawn(tempFile, [], { env: {...process.env, ...variables}, windowsHide:true });
 
             // You can also use a variable to save the output 
             // for when the script closes later
             var stdoutCollection = [];
             var stderrCollection = [];
 
-            process.stdout.setEncoding('utf8');
-            process.stdout.on('data', function (data) {
+            _process.stdout.setEncoding('utf8');
+            _process.stdout.on('data', function (data) {
                 //Here is where the output goes
                 var rawString = data.toString();
                 stdoutCollection.push(rawString);
             });
 
-            process.stderr.setEncoding('utf8');
-            process.stderr.on('data', function (data) {
+            _process.stderr.setEncoding('utf8');
+            _process.stderr.on('data', function (data) {
                 //Here is where the error output goes
                 var rawString = data.toString();
                 stderrCollection.push(rawString);
             });
-            process.on('error', function (err) {
+            _process.on('error', function (err) {
                 // *** Process creation failed
                 deleteFile(tempFile);
                 var stackTrace = err.toString();
@@ -110,7 +110,7 @@ function ShellHelper() {
                 var code = err.errno;
                 reject({ code, stdout, stderr, stackTrace, rawPayload, fullStackTraceErr: err });
             });
-            process.on('close', function (code) { // Should probably be 'exit', not 'close'                
+            _process.on('close', function (code) { // Should probably be 'exit', not 'close'                
                 // *** Process completed
                 deleteFile(tempFile);
                 var stdout, stderr, rawPayload;
