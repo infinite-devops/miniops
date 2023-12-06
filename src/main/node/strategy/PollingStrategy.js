@@ -60,6 +60,7 @@ function PullingStrategy(){
         const job = schedule.scheduleJob(params.cron_expression, async function(){
             var uuidExecution = uuidv4();
             var miniopsStatusLocation = path.join(os.tmpdir(), "miniops.txt")
+            var miniopsLogStatusLocation = path.join(os.tmpdir(), "miniops_log.txt")
             var miniopsStatus;
             try {
                 miniopsStatus = await fs.promises.readFile(miniopsStatusLocation, "utf-8");
@@ -69,7 +70,7 @@ function PullingStrategy(){
             }
         
             if(miniopsStatus==="in-progress"){
-                logger.info("Another job is in progress")
+                logger.info("Another job is in progress. To force the execution, delete this file: "+miniopsStatusLocation)
                 return;
             }
 
@@ -83,6 +84,7 @@ function PullingStrategy(){
                 logger.error(error); 
                 logger.info("failed: "+uuidExecution)
                 await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }
         
@@ -92,6 +94,7 @@ function PullingStrategy(){
                 logger.error(error); 
                 logger.info("failed: "+uuidExecution)
                 await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }
         
@@ -102,6 +105,7 @@ function PullingStrategy(){
                 logger.error(error); 
                 logger.info("failed: "+uuidExecution)
                 await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }
         

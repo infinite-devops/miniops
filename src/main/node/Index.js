@@ -18,6 +18,11 @@ function Index() {
       return;
     }
 
+    if (args.action !== "start" && args.action !== "stop") {
+      logger.error("allowed --action values are: start , stop");
+      return;
+    }    
+
     var status;
     try {
       await HttpHelper.get(
@@ -39,18 +44,17 @@ function Index() {
           logger.info(response);
           return;
         } catch (err) {
-          logger.debug(err);
-          logger.info("miniops is already stopped");
+          logger.info("failed to stop miniops");
+          logger.error(err)
           return;
         }
+      }else {
+        logger.info("miniops is already stopped");
+        return;
       }
     }
 
-    if (args.action !== "start") {
-        logger.error("allowed --action values are: start , stop");
-        return;
-    }
-
+    //we are in the start action
     logger.info("miniops will start");
 
     var app = express();
