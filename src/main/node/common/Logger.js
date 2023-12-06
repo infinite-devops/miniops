@@ -34,7 +34,8 @@ Logger.info = (message) => {
 }
 
 Logger.debug = (message) => {
-    if(!process.env.LOGGER_LEVEL==="debug")return;
+    if(typeof process.env.LOGGER_LEVEL === 'undefined' || process.env.LOGGER_LEVEL==="" ||  !process.env.LOGGER_LEVEL==="debug" ) return;
+    
     var dateString = getCurrentDateFormat();
     if(typeof message === 'string'){
         console.log(`${dateString} DEBUG - ${message}`);

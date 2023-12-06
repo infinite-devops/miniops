@@ -30,8 +30,15 @@ var DevopsTask = require('../../../main/node/core/DevopsTask.js');
 const ShellHelper = require('../../../main/node/common/ShellHelper.js');
 const Pipeline = require('../../../main/node/core/Pipeline.js');
 const { v4: uuidv4 } = require('uuid');
+var Logger = require('../../../main/node/common/Logger.js');
 
 describe('DevopsTask', function() {
+  it('should work', async function() {
+    Logger.info("info")
+    Logger.error("error")
+    Logger.debug("debug")
+  });
+
   it('should work', async function() {
     var shellHelperMock = new function(){
       this.executeSingleLine = async (rawStatement) => {

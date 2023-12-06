@@ -58,7 +58,7 @@ function DevopsTask(shellHelper, pipeline) {
             //file does not exist so is the first time
             isFirstTime = true; 
             previousCommitId = currentCommitId;
-            fs.promises.writeFile(fileInfoLocation, currentCommitId);
+            await fs.promises.writeFile(fileInfoLocation, currentCommitId);
         }
         logger.info("previousCommitId:"+previousCommitId)
         logger.info("currentCommitId:"+currentCommitId)
@@ -71,25 +71,19 @@ function DevopsTask(shellHelper, pipeline) {
         var workspaceFullLocation = path.join(os.tmpdir(), uuidv4());
         await fs.promises.mkdir(workspaceFullLocation);
         var variables = {gitUrl, branchName, yamlFullLocation, currentCommitId, workspaceFullLocation};
+        logger.info("executing: "+yamlFullLocation)
         var response = await pipeline.executeFile(yamlFullLocation, variables);
-
+        logger.info("completed: "+yamlFullLocation)
         try {
-            fs.promises.writeFile(fileInfoLocation, currentCommitId);
+            await fs.promises.writeFile(fileInfoLocation, currentCommitId);
         }
         catch (e) {
             logger.debug(e);
         }
-
-        deleteFile(workspaceFullLocation)
+        logger.info("deleting workspace: "+workspaceFullLocation) 
+        await fs.promises.rm(workspaceFullLocation, { recursive: true }, () => logger.info('successfully deleted: ' + workspaceFullLocation));
         return {...response, changed: true}
-    };
-
-    function deleteFile(location) {
-        fs.unlink(location, (err) => {
-            if (err) throw err;
-            logger.info('successfully deleted: ' + location);
-        });
-    }    
+    }; 
 
 }
 
