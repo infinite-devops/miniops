@@ -23,12 +23,29 @@
 
 function Logger() { }
 
+var logExist=false;
+
+if(typeof process.env.LOGGER_FILE_LOCATION !== 'undefined' && process.env.LOGGER_FILE_LOCATION!=""){    
+    try {
+        await fs.promises.readFile(process.env.LOGGER_FILE_LOCATION, "utf-8");
+        logExist=true;
+    }
+    catch (e) {
+        console.error("logger file does not exist: "+process.env.LOGGER_FILE_LOCATION);
+        await fs.promises.writeFile(process.env.LOGGER_FILE_LOCATION, "");
+        logExist=true;
+    }
+
+}
+
 Logger.info = (message) => {
     var dateString = getCurrentDateFormat();
     if(typeof message === 'string'){
         console.log(`${dateString} INFO  - ${message}`);
+        writeToLog(`${dateString} INFO  - ${message}`);
     }else{
         console.log(`${dateString} INFO  - `, message);
+        writeToLog(`${dateString} INFO  - ${JSON.stringify(message)}`);
     }
     
 }
@@ -39,8 +56,10 @@ Logger.debug = (message) => {
     var dateString = getCurrentDateFormat();
     if(typeof message === 'string'){
         console.log(`${dateString} DEBUG - ${message}`);
+        writeToLog(`${dateString} DEBUG - ${message}`);
     }else{
         console.log(`${dateString} DEBUG - `, message);
+        writeToLog(`${dateString} DEBUG - ${JSON.stringify(message)}`);
     }
 }
 
@@ -48,10 +67,19 @@ Logger.error = (message) => {
     var dateString = getCurrentDateFormat();
     if(typeof message === 'string'){
         console.error(`${dateString} ERROR - ${message}`);
+        writeToLog(`${dateString} ERROR - ${message}`);
     }else{
         console.error(`${dateString} ERROR - `, message);
+        writeToLog(`${dateString} ERROR - ${JSON.stringify(message)}`);
     }
     
+}
+
+function writeToLog(message){
+    if(logExist===false) return;
+    fs.appendFile(process.env.LOGGER_FILE_LOCATION, message, function (err) {
+        if (err) throw err;
+    });
 }
 
 const getCurrentDateFormat = function() {
