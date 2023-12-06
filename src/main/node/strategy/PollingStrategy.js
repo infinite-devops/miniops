@@ -30,7 +30,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const express = require('express');
 
 function PullingStrategy(){
 
@@ -52,14 +51,7 @@ function PullingStrategy(){
         if(typeof params.yaml_location === 'undefined'){
             logger.error("yaml_location parameter is required")
             return;
-        }
-
-        var app = express();
-
-        app.get('/health', function(req, res) {
-          res.type('text/plain');
-          res.send('King Bob!');
-        });
+        }               
         
         var shellHelper = new ShellHelper();
         var pipeline = new Pipeline();
@@ -114,9 +106,7 @@ function PullingStrategy(){
             }
         
             logger.info("completed: "+uuidExecution)
-        });
-        
-        app.listen(process.env.PORT || 9000);
+        });        
     }
 
 }
