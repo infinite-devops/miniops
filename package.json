@@ -4,7 +4,7 @@
   "description": "miniops",
   "main": "src/main/Index.js",
   "bin": {
-    "miniops": "src/index.js"
+    "miniops": "./bin/miniops"
   },
   "scripts": {
     "start:polling": "node src/main/node/Index.js --mode=polling",
