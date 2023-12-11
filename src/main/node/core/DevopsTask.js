@@ -75,7 +75,6 @@ function DevopsTask(shellHelper, pipeline) {
         var variables = {gitUrl, branchName, yamlFullLocation, currentCommitId, workspaceFullLocation};
         logger.info("executing: "+yamlFullLocation)
         var response = await pipeline.executeFile(yamlFullLocation, variables);
-        logger.info("completed: "+yamlFullLocation)
         try {
             await fs.promises.writeFile(fileInfoLocation, currentCommitId);
         }
