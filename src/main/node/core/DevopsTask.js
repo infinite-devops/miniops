@@ -30,42 +30,44 @@ const { v4: uuidv4 } = require('uuid');
 
 function DevopsTask(shellHelper, pipeline) {
 
-    this.start = async (gitUrl, branchName, yamlFullLocation) => {
+    this.start = async (gitUrl, branchName, yamlFullLocation, disableOnChageValidation) => {
 
         logger.info("job is starting...")
 
         if (typeof gitUrl === 'undefined') throw new Error("gitUrl is required");
         if (typeof branchName === 'undefined') throw new Error("branchName is required");
 
-        var currentCommitId, previousCommitId;
-        try {
-            logger.info("diff query: "+`git ls-remote ${gitUrl} ${branchName}`);
-            var response = await shellHelper.executeSingleLine(`git ls-remote ${gitUrl} ${branchName}`);
-            logger.info("diff result: "+JSON.stringify(response));
-            currentCommitId = response.stdout.split(/\s+/)[0].trim();
-        } catch (err) {
-            throw ErrorHelper.reThrow(`Failed to read git commit`, err);
-        }
-
-        var repositoryName = gitUrl.split("/").pop().replace(".git", "");
-        var fileInfoLocation = path.join(os.tmpdir(), `${repositoryName}-${branchName}`)
-        var isFirstTime = false;
-        try {
-            previousCommitId = await fs.promises.readFile(fileInfoLocation, "utf-8");
-        }
-        catch (e) {
-            logger.debug(e);
-            //file does not exist so is the first time
-            isFirstTime = true; 
-            previousCommitId = currentCommitId;
-            await fs.promises.writeFile(fileInfoLocation, currentCommitId);
-        }
-        logger.info("previousCommitId:"+previousCommitId)
-        logger.info("currentCommitId:"+currentCommitId)
-        
-        if(!isFirstTime && previousCommitId===currentCommitId){
-            logger.info("git repository and branch does not have changes")
-            return {changed: false}
+        if(typeof disableOnChageValidation==='undefined' || disableOnChageValidation===false){
+            var currentCommitId, previousCommitId;
+            try {
+                logger.info("diff query: "+`git ls-remote ${gitUrl} ${branchName}`);
+                var response = await shellHelper.executeSingleLine(`git ls-remote ${gitUrl} ${branchName}`);
+                logger.info("diff result: "+JSON.stringify(response));
+                currentCommitId = response.stdout.split(/\s+/)[0].trim();
+            } catch (err) {
+                throw ErrorHelper.reThrow(`Failed to read git commit`, err);
+            }
+    
+            var repositoryName = gitUrl.split("/").pop().replace(".git", "");
+            var fileInfoLocation = path.join(os.tmpdir(), `${repositoryName}-${branchName}`)
+            var isFirstTime = false;
+            try {
+                previousCommitId = await fs.promises.readFile(fileInfoLocation, "utf-8");
+            }
+            catch (e) {
+                logger.debug(e);
+                //file does not exist so is the first time
+                isFirstTime = true; 
+                previousCommitId = currentCommitId;
+                await fs.promises.writeFile(fileInfoLocation, currentCommitId);
+            }
+            logger.info("previousCommitId:"+previousCommitId)
+            logger.info("currentCommitId:"+currentCommitId)
+            
+            if(!isFirstTime && previousCommitId===currentCommitId){
+                logger.info("git repository and branch does not have changes")
+                return {changed: false}
+            }
         }
 
         var workspaceFullLocation = path.join(os.tmpdir(), uuidv4());
@@ -81,7 +83,7 @@ function DevopsTask(shellHelper, pipeline) {
             logger.debug(e);
         }
         logger.info("deleting workspace: "+workspaceFullLocation) 
-        await fs.promises.rm(workspaceFullLocation, { recursive: true }, () => logger.info('successfully deleted: ' + workspaceFullLocation));
+        //await fs.promises.rm(workspaceFullLocation, { recursive: true }, () => logger.info('successfully deleted: ' + workspaceFullLocation));
         return {...response, changed: true}
     }; 
 

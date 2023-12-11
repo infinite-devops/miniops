@@ -2,12 +2,12 @@
   "name": "miniops",
   "version": "1.0.0",
   "description": "miniops",
-  "main": "src/main/Index.js",
+  "main": "src/main/Entrypoint.js",
   "bin": {
     "miniops": "./bin/miniops"
   },
   "scripts": {
-    "start:polling": "node src/main/node/Index.js --action=start --mode=polling",
+    "start:polling": "node ./bin/miniops --action=start --mode=polling",
     "test": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit --require mocha-suppress-logs && npm run badges",
     "test:verbose": "nyc --reporter=html --reporter=json-summary mocha  'src/test/node/**/*.test.js' --exit  --timeout 100000 && npm run badges",
     "badges": "badges4cov --source=nyc_json --nyc_json_file_location=./coverage/coverage-summary.json --output_folder=./coverage"
@@ -19,7 +19,9 @@
     "core-js": "3.6.5",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
+    "node-git-server": "^1.0.0",
     "node-schedule": "^2.1.1",
+    "sinon": "^17.0.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

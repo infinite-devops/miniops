@@ -69,8 +69,8 @@ function PullingStrategy(){
                 logger.debug(e);
             }
         
-            if(miniopsStatus==="in-progress"){
-                logger.info("Another job is in progress. To force the execution, delete this file: "+miniopsStatusLocation)
+            if(miniopsStatus.startsWith("in-progress")){
+                logger.info("Another job is in progress ${miniopsStatus}. To force the execution, delete this file: "+miniopsStatusLocation)
                 return;
             }
 
@@ -78,12 +78,12 @@ function PullingStrategy(){
             logger.info('Starting job: '+uuidExecution);
             
             try {
-                await fs.promises.writeFile(miniopsStatusLocation, "in-progress");
+                await fs.promises.writeFile(miniopsStatusLocation, "in-progress : "+uuidExecution);
             }
             catch (error) {
                 logger.error(error); 
                 logger.info("failed: "+uuidExecution)
-                await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                await fs.promises.writeFile(miniopsStatusLocation, "failed : "+uuidExecution);
                 await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }
@@ -93,18 +93,18 @@ function PullingStrategy(){
             } catch (error) {
                 logger.error(error); 
                 logger.info("failed: "+uuidExecution)
-                await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                await fs.promises.writeFile(miniopsStatusLocation, "failed : "+uuidExecution);
                 await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }
         
             try {
-                await fs.promises.writeFile(miniopsStatusLocation, response.code==0?"completed": "failed");
+                await fs.promises.writeFile(miniopsStatusLocation, response.code==0?"completed : "+uuidExecution: "failed : "+uuidExecution);
             }
             catch (error) {
                 logger.error(error); 
                 logger.info("failed: "+uuidExecution)
-                await fs.promises.writeFile(miniopsStatusLocation, "failed");
+                await fs.promises.writeFile(miniopsStatusLocation, "failed : "+uuidExecution);
                 await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }

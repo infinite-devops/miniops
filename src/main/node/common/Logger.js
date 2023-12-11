@@ -21,24 +21,32 @@
  *   SOFTWARE.
  */
 
-function Logger() { }
+const fs = require("fs");
+const os = require("os");
 
+var config = {};
 var logExist=false;
 
-if(typeof process.env.LOGGER_FILE_LOCATION !== 'undefined' && process.env.LOGGER_FILE_LOCATION!=""){    
-    try {
-        await fs.promises.readFile(process.env.LOGGER_FILE_LOCATION, "utf-8");
-        logExist=true;
-    }
-    catch (e) {
-        console.error("logger file does not exist: "+process.env.LOGGER_FILE_LOCATION);
-        await fs.promises.writeFile(process.env.LOGGER_FILE_LOCATION, "");
-        logExist=true;
-    }
+function Logger() {}
 
-}
+Logger.init = (_config) => {
+    if(_config) config = _config;
+    if(typeof config.loggerFileLocation !== 'undefined' && config.loggerFileLocation!=""){    
+        try {
+            fs.readFileSync(config.loggerFileLocation, "utf-8");
+            logExist=true;
+        }
+        catch (e) {
+            console.error("logger file does not exist: "+config.loggerFileLocation);
+            fs.writeFileSync(config.loggerFileLocation, "");
+            logExist=true;
+        }
+    
+    }    
+}    
 
 Logger.info = (message) => {
+
     var dateString = getCurrentDateFormat();
     if(typeof message === 'string'){
         console.log(`${dateString} INFO  - ${message}`);
@@ -51,7 +59,7 @@ Logger.info = (message) => {
 }
 
 Logger.debug = (message) => {
-    if(typeof process.env.LOGGER_LEVEL === 'undefined' || process.env.LOGGER_LEVEL==="" ||  !process.env.LOGGER_LEVEL==="debug" ) return;
+    if(typeof config.loggerLevel === 'undefined' || config.loggerLevel==="" ||  !config.loggerLevel==="debug" ) return;
     
     var dateString = getCurrentDateFormat();
     if(typeof message === 'string'){
@@ -77,7 +85,8 @@ Logger.error = (message) => {
 
 function writeToLog(message){
     if(logExist===false) return;
-    fs.appendFile(process.env.LOGGER_FILE_LOCATION, message, function (err) {
+    if(typeof config.loggerFileLocation === 'undefined') return;
+    fs.appendFile(config.loggerFileLocation, message+os.EOL, function (err) {
         if (err) throw err;
     });
 }
