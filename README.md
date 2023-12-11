@@ -45,26 +45,42 @@ Similar to the yaml of gitlab, bitbucket, github actions, etc we need to create 
 [Yaml-templates_](https://github.com/usil/miniops/wiki/Yaml-templates_)
 
 
-## Run - Windows
+## Variables
+
+**Windows**
 
 ```
 set cron_expression=*/15 * * * * *
 set git_url=https://github.com/usil/asp-classic-hello-world.git
 set git_branch=develop
 set yaml_location=C:\foo\bar\acme.yaml
-
-miniops --action=start --mode=polling
 ```
 
-## Run - Linux
+**Linux**
 
 ```
 export cron_expression="*/15 * * * * *"
 export git_url=https://github.com/foo/java-web-hello-world.git
 export git_branch=develop
 export yaml_location=/foo/bar/acme.yaml
+```
 
-miniops --action=start --mode=polling
+## Run (direct execution)
+
+```
+miniops --mode=direct
+```
+
+## Run (polling execution)
+
+```
+miniops --mode=polling
+```
+
+## Stop
+
+```
+miniops --action=stop
 ```
 
 ## Logs
@@ -87,7 +103,8 @@ To try another version:
 - delete it
 
 ```
-pm2 delete miniops
+npm uninstall -g https://github.com/usil/miniops.git#1.0.0-snapshot
+npm uninstall -g miniops
 ```
 
 - clone or pull

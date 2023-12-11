@@ -24,8 +24,8 @@ function Entrypoint() {
       return;
     }
 
-    if (args.mode !== "polling" && args.mode !== "instant") {
-      logger.error("--mode has an invalid value. Allowed: polling , instant");
+    if (args.mode !== "polling" && args.mode !== "direct") {
+      logger.error("--mode has an invalid value. Allowed: polling , direct");
       return;
     }
 
@@ -36,7 +36,7 @@ function Entrypoint() {
       cron_expression: process.env.cron_expression || args.cron_expression,
     };
 
-    if (args.mode === "instant") {
+    if (args.mode === "direct") {
 
       var uuidExecution = uuidv4();
       logger.info('Starting job: '+uuidExecution);
@@ -113,7 +113,7 @@ function Entrypoint() {
           <img id="pic" src="https://raw.githubusercontent.com/usil/miniops/1.0.0-snapshot/.assets/logo.png" width=200>
           <script>
           let x = document.getElementById("pic");
-          var angles = [45, 90, 270, 360]
+          var angles = [45, 90, 270, 360, -45, -90, -270, -360]
           var rand = Math.floor(Math.random() * angles.length)
           x.style.transform = "rotate("+ (angles[rand]) +"deg)"          
           </script>

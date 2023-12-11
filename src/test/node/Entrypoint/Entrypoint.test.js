@@ -48,13 +48,13 @@ describe("Entrypoint", function () {
     sinon.restore();
   });  
 
-  it("should start the instant", async function () {
+  it("should start the direct", async function () {
     sinon
       .stub(process, "argv")
       .value([
         "/home/foo/.nvm/versions/node/v16.20.2/bin/node",
         "/home/foo/Github/miniops/bin/miniops",
-        "--mode=instant",
+        "--mode=direct",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
         "--yaml_location="+path.join(__dirname, "simple.yaml")
