@@ -14,20 +14,10 @@ function Entrypoint() {
 
   this.start = async () => {
 
-    logger.init({loggerFileLocation: process.env.LOG_FILE_LOCATION, loggerLevel: process.env.LOGGER_LEVEL});
+    logger.init({loggerFileLocation: process.env.log_file_location, loggerLevel: process.env.logger_level});
 
     logger.info("arguments");
     logger.info(args);
-
-    if (typeof args.mode === "undefined") {
-      logger.error("--mode parameter is required");
-      return;
-    }
-
-    if (args.mode !== "polling" && args.mode !== "direct") {
-      logger.error("--mode has an invalid value. Allowed: polling , direct");
-      return;
-    }
 
     var params = {
       git_url: process.env.git_url || args.git_url,
@@ -35,6 +25,8 @@ function Entrypoint() {
       yaml_location: process.env.yaml_location || args.yaml_location,
       cron_expression: process.env.cron_expression || args.cron_expression,
     };
+
+    logger.info('mode: '+args.mode);
 
     if (args.mode === "direct") {
 
@@ -56,21 +48,21 @@ function Entrypoint() {
       logger.info(response.code==0?"completed : "+uuidExecution: "failed : "+uuidExecution)
       return response;
     }
+    
+    if (typeof args.mode !== 'undefined' && args.mode !== "direct") {
+      logger.error("--mode has an invalid value. Allowed: direct");
+      return;
+    }    
 
-    //at this point only the polling mode is available
-    //polling mode needs a live server, so the action is required
+    //by default if mode is not entered, polling mode is chosen
+    //pooling mode needs an action
 
     if (typeof args.action === "undefined") {
       logger.error("--action parameter is required");
       return;
     }
 
-    if (args.action !== "start" && args.action !== "stop") {
-      logger.error("--action has an invalid value. Allowed: start , stop");
-      return;
-    }
-
-    logger.info('mode: '+args.mode);
+    logger.info('action: '+args.action);
 
     var status;
     try {
@@ -101,7 +93,12 @@ function Entrypoint() {
       }
     }
 
-    //we are in the start action
+    if (args.action !== "start" && args.action !== "stop") {
+      logger.error("--action has an invalid value. Allowed: start , stop");
+      return;
+    }
+
+    //we are in the action=start
     logger.info("miniops will start");
 
     var app = express();

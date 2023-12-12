@@ -54,6 +54,8 @@ set cron_expression=*/15 * * * * *
 set git_url=https://github.com/usil/asp-classic-hello-world.git
 set git_branch=develop
 set yaml_location=C:\foo\bar\acme.yaml
+set logger_level=debug
+set log_file_location=C:\foo\bar\acme-devops.log
 ```
 
 **Linux**
@@ -63,6 +65,8 @@ export cron_expression="*/15 * * * * *"
 export git_url=https://github.com/foo/java-web-hello-world.git
 export git_branch=develop
 export yaml_location=/foo/bar/acme.yaml
+export logger_level=debug
+export log_file_location=/foo/bar/acme-devops.log
 ```
 
 ## Run (direct execution)
@@ -74,26 +78,13 @@ miniops --mode=direct
 ## Run (polling execution)
 
 ```
-miniops --mode=polling
+miniops --action=start
 ```
 
 ## Stop
 
 ```
 miniops --action=stop
-```
-
-## Logs
-
-```
-pm2 flush miniops
-pm2 logs miniops
-```
-
-## Delete
-
-```
-pm2 delete miniops
 ```
 
 ## Update
@@ -109,11 +100,6 @@ npm uninstall -g miniops
 
 - clone or pull
 - start again
-
-## References
-
-https://betterstack.com/community/guides/scaling-nodejs/pm2-guide/
-
 
 ## Acknowledgments
 

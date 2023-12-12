@@ -12,7 +12,39 @@ const HttpHelper = require("../../../main/node/common/HttpHelper.js");
 
 describe("Entrypoint", function () {
 
-  it("should validate the mode", async function () {
+  it("should start the direct", async function () {
+    sinon
+      .stub(process, "argv")
+      .value([
+        "/home/foo/.nvm/versions/node/v16.20.2/bin/node",
+        "/home/foo/Github/miniops/bin/miniops",
+        "--mode=direct",
+        "--git_url=http://localhost:6000/bar",
+        "--git_branch=master",
+        "--yaml_location="+path.join(__dirname, "simple.yaml")
+      ]);
+
+    const repos = new GitServer.Git(path.join(__dirname, "git_server_mock"), {
+      autoCreate: true,
+    });
+    const port = 6000;
+    const server = http
+      .createServer((req, res) => {
+        repos.handle(req, res);
+      })
+      .listen(port);
+
+
+    var entrypoint = new Entrypoint();
+    var response = await entrypoint.start();
+
+    console.log(response);
+    expect(response.stdout.includes("im_a_commited_file.txt")).to.eq(true)
+
+    sinon.restore();
+  });  
+  
+  it("should validate an invalid mode", async function () {
     sinon
       .stub(process, "argv")
       .value([
@@ -47,47 +79,15 @@ describe("Entrypoint", function () {
 
     sinon.restore();
   });  
-
-  it("should start the direct", async function () {
-    sinon
-      .stub(process, "argv")
-      .value([
-        "/home/foo/.nvm/versions/node/v16.20.2/bin/node",
-        "/home/foo/Github/miniops/bin/miniops",
-        "--mode=direct",
-        "--git_url=http://localhost:6000/bar",
-        "--git_branch=master",
-        "--yaml_location="+path.join(__dirname, "simple.yaml")
-      ]);
-
-    const repos = new GitServer.Git(path.join(__dirname, "git_server_mock"), {
-      autoCreate: true,
-    });
-    const port = 6000;
-    const server = http
-      .createServer((req, res) => {
-        repos.handle(req, res);
-      })
-      .listen(port);
-
-
-    var entrypoint = new Entrypoint();
-    var response = await entrypoint.start();
-
-    console.log(response);
-    expect(response.stdout.includes("im_a_commited_file.txt")).to.eq(true)
-
-    sinon.restore();
-  });   
   
-  it("should validate the --action param if pulling mode is enabled", async function () {
+  
+  it("should validate the --action param if polling mode is chosen", async function () {
 
     sinon
       .stub(process, "argv")
       .value([
         "/home/foo/.nvm/versions/node/v16.20.2/bin/node",
         "/home/foo/Github/miniops/bin/miniops",
-        "--mode=polling",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
         "--yaml_location="+path.join(__dirname, "simple.yaml")
@@ -140,7 +140,6 @@ describe("Entrypoint", function () {
       .value([
         "/home/foo/.nvm/versions/node/v16.20.2/bin/node",
         "/home/foo/Github/miniops/bin/miniops",
-        "--mode=polling",
         "--action=stop",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
