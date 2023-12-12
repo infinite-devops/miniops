@@ -77,9 +77,19 @@ miniops --mode=direct
 
 ## Run (polling execution)
 
+**linux**
+
 ```
-miniops --action=start
+nohup miniops --action=start >/dev/null 2>&1 &
 ```
+
+**windows**
+
+```
+START "miniops" /B miniops --action=start > NUL
+```
+
+> close the cmd window :/
 
 ## Stop
 
@@ -87,9 +97,15 @@ miniops --action=start
 miniops --action=stop
 ```
 
+## Check status
+
+```
+miniops --action=status
+```
+
 ## Update
 
-To try another version:
+To try the latest or custom version:
 
 - delete it
 

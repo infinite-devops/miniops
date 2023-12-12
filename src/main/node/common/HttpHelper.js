@@ -28,17 +28,28 @@ function HttpHelper() { }
 HttpHelper.get = (url, params) => {    
 
     return new Promise(function (resolve, reject) {
-        http.get(url, res => {
-            let data = [];            
-            res.on('data', chunk => {
-              data.push(chunk);
-            });          
-            res.on('end', () => {
-                resolve({code:res.statusCode, headers: res.headers, rawData: Buffer.concat(data).toString()})
-            });
-          }).on('error', err => {
-            reject({err: err});
-          });
+      http.get(url, (res) => {
+        const { statusCode } = res;
+      
+        // Any 2xx status code signals a successful response but
+        // here we're only checking for 200.
+        if (statusCode !== 200) {
+          reject({code:res.statusCode, headers: res.headers})
+        }
+      
+        res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', (chunk) => { rawData += chunk; });
+        res.on('end', () => {
+          try {
+            resolve({code:res.statusCode, headers: res.headers, rawData: rawData})
+          } catch (err) {
+            reject({code:res.statusCode, headers: res.headers, rawData: rawData, err: err})
+          }
+        });
+      }).on('error', (err) => {
+        reject({err: err});
+      });                    
     });
 }
 

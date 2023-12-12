@@ -5,6 +5,7 @@ const DevopsTask = require('./core/DevopsTask.js');
 const ShellHelper = require('./common/ShellHelper.js');
 const Pipeline = require('./core/Pipeline.js');
 const express = require("express");
+const { once } = require('events');
 const { v4: uuidv4 } = require('uuid');
 const PullingStrategy = require("./strategy/PollingStrategy.js");
 
@@ -73,7 +74,11 @@ function Entrypoint() {
       status = "offline";
     }
 
-    if (args.action === "stop") {
+    if (args.action === "status") {
+      logger.info(`status: ${status}`);
+      return;
+    }else if (args.action === "stop") {
+      logger.info(`status: ${status}`);
       if (status == "online") {
         //get the current status
         try {
@@ -83,8 +88,8 @@ function Entrypoint() {
           logger.info(response);
           return;
         } catch (err) {
-          logger.info("failed to stop miniops");
           logger.error(err);
+          logger.info("failed to stop miniops");
           return;
         }
       } else {
@@ -128,12 +133,8 @@ function Entrypoint() {
     });
 
     var server = app.listen(port);
-
-    server = await (  // use await to wait
-      async() => {
-        logger.info(`miniops listening at http://localhost:${port}`);
-      }
-    )();     
+    await once(server, 'listening');
+    logger.info(`miniops listening at http://localhost:${port}`);    
 
     //delay some seconds
     setTimeout(()=>{

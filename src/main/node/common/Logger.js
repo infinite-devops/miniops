@@ -52,7 +52,7 @@ Logger.info = (message) => {
         console.log(`${dateString} INFO  - ${message}`);
         writeToLog(`${dateString} INFO  - ${message}`);
     }else{
-        console.log(`${dateString} INFO  - `, message);
+        console.log(`${dateString} INFO  - ${JSON.stringify(message)}`);
         writeToLog(`${dateString} INFO  - ${JSON.stringify(message)}`);
     }
     
