@@ -20,7 +20,7 @@ describe("Entrypoint - Direct", function () {
         "--mode=direct",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
-        "--yaml_location="+path.join(__dirname, "simple.yaml")
+        "--yaml_full_location="+path.join(__dirname, "simple.yaml")
       ]);
 
     const repos = new GitServer.Git(path.join(__dirname, "git_server_mock"), {
@@ -89,7 +89,7 @@ describe("Entrypoint - Direct", function () {
         "/home/foo/Github/miniops/bin/miniops",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
-        "--yaml_location="+path.join(__dirname, "simple.yaml")
+        "--yaml_full_location="+path.join(__dirname, "simple.yaml")
       ]);
 
     var initialLog = console.log;
@@ -277,7 +277,7 @@ describe("Entrypoint - Direct", function () {
         "--action=stop",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
-        "--yaml_location="+path.join(__dirname, "simple.yaml")
+        "--yaml_full_location="+path.join(__dirname, "simple.yaml")
       ]);
 
     var entrypoint = new Entrypoint();

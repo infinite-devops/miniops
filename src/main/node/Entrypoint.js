@@ -13,6 +13,7 @@ function Entrypoint() {
   const port = process.env.PORT || 2708;
   const args = argsParser(process.argv);
   var server;
+  var pullingStrategy;
 
   this.start = async () => {
 
@@ -24,7 +25,7 @@ function Entrypoint() {
     var params = {
       git_url: process.env.git_url || args.git_url,
       git_branch: process.env.git_branch || args.git_branch,
-      yaml_location: process.env.yaml_location || args.yaml_location,
+      yaml_full_location: process.env.yaml_full_location || args.yaml_full_location,
       cron_expression: process.env.cron_expression || args.cron_expression,
     };
 
@@ -40,12 +41,12 @@ function Entrypoint() {
       var pipeline = new Pipeline();
       var devopsTask = new DevopsTask(shellHelper, pipeline);
 
-      response = await devopsTask.start(
-        params.git_url,
-        params.git_branch,
-        params.yaml_location,
-        true
-      );
+      response = await devopsTask.start({
+        gitUrl: params.git_url,
+        branchName: params.git_branch,
+        yamlFullLocation: params.yaml_full_location,
+        disableOnChageValidation: true      
+      });
       logger.info("completed: "+uuidExecution)      
       logger.info(response.code==0?"completed : "+uuidExecution: "failed : "+uuidExecution)
       return response;
@@ -143,16 +144,15 @@ function Entrypoint() {
     logger.info(`miniops listening at http://localhost:${port}`);    
 
     //delay some seconds
-    setTimeout(()=>{
-      logger.info(`miniops polling started`);   
-      var pullingStrategy = new PullingStrategy();
-      pullingStrategy.start(params);
-    }, process.env.polling_initial_Delay || 1000);
+    logger.info(`miniops polling started`);   
+    pullingStrategy = new PullingStrategy();
+    pullingStrategy.start(params);
     
   };
 
   this.stop = async () => {
     await server.close();
+    await pullingStrategy.stop();
   }  
 }
 

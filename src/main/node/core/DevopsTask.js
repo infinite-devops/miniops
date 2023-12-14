@@ -27,29 +27,31 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { v4: uuidv4 } = require('uuid');
+const MailService = require("../service/MailService.js");
 
 function DevopsTask(shellHelper, pipeline) {
 
-    this.start = async (gitUrl, branchName, yamlFullLocation, disableOnChageValidation) => {
+    this.start = async (devopsSettings, notificationSettings) => {
 
         logger.info("task is starting...")
+        logger.info(devopsSettings)
 
-        if (typeof gitUrl === 'undefined') throw new Error("gitUrl is required");
-        if (typeof branchName === 'undefined') throw new Error("branchName is required");
+        if (typeof devopsSettings.gitUrl === 'undefined') throw new Error("gitUrl is required");
+        if (typeof devopsSettings.branchName === 'undefined') throw new Error("branchName is required");
 
-        if(typeof disableOnChageValidation==='undefined' || disableOnChageValidation===false){
+        if(typeof devopsSettings.disableOnChageValidation==='undefined' || devopsSettings.disableOnChageValidation===false){
             var currentCommitId, previousCommitId;
             try {
-                logger.info("diff query: "+`git ls-remote ${gitUrl} ${branchName}`);
-                var response = await shellHelper.executeSingleLine(`git ls-remote ${gitUrl} ${branchName}`);
+                logger.info("diff query: "+`git ls-remote ${devopsSettings.gitUrl} ${devopsSettings.branchName}`);
+                var response = await shellHelper.executeSingleLine(`git ls-remote ${devopsSettings.gitUrl} ${devopsSettings.branchName}`);
                 logger.info("diff result: "+JSON.stringify(response));
                 currentCommitId = response.stdout.split(/\s+/)[0].trim();
             } catch (err) {
                 throw ErrorHelper.reThrow(`Failed to read git commit`, err);
             }
     
-            var repositoryName = gitUrl.split("/").pop().replace(".git", "");
-            var fileInfoLocation = path.join(os.tmpdir(), `${repositoryName}-${branchName}`)
+            var repositoryName = devopsSettings.gitUrl.split("/").pop().replace(".git", "");
+            var fileInfoLocation = path.join(os.tmpdir(), `${repositoryName}-${devopsSettings.branchName}`)
             var isFirstTime = false;
             try {
                 previousCommitId = await fs.promises.readFile(fileInfoLocation, "utf-8");
@@ -70,11 +72,25 @@ function DevopsTask(shellHelper, pipeline) {
             }
         }
 
+        // const mailService = new MailService();
+
+
+
+        // mailService.initialize({
+        //     smtpHost: "localhost",
+        //     smtpPort: 2526,
+        //     smtpUser: "foo",
+        //     smtpPassword: "bar",
+        //     smtpSecure: "true",
+        //     rejectUnauthorized: "false",
+        //     from: "foo@mail.com",
+        //   });        
+
         var workspaceFullLocation = path.join(os.tmpdir(), uuidv4());
         await fs.promises.mkdir(workspaceFullLocation);
-        var variables = {gitUrl, branchName, yamlFullLocation, currentCommitId, workspaceFullLocation};
-        logger.info("executing: "+yamlFullLocation)
-        var response = await pipeline.executeFile(yamlFullLocation, variables);
+        var variables = {gitUrl: devopsSettings.gitUrl, branchName: devopsSettings.branchName, yamlFullLocation: devopsSettings.yamlFullLocation, currentCommitId, workspaceFullLocation};
+        logger.info("executing: "+devopsSettings.yamlFullLocation)
+        var response = await pipeline.executeFile(devopsSettings.yamlFullLocation, variables);
         try {
             await fs.promises.writeFile(fileInfoLocation, currentCommitId);
         }

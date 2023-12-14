@@ -53,7 +53,13 @@ describe('DevopsTask', function() {
     };    
     var devopsTask = new DevopsTask(shellHelperMock, pipelineMock);
 
-    var response = await devopsTask.start("foo/bar.git", uuidv4(), "/some/unicorn.yaml");
+    var response = await devopsTask.start({
+      gitUrl: "foo/bar.git",
+      branchName: uuidv4(),
+      yamlFullLocation: "/some/unicorn.yaml",
+      disableOnChageValidation: false      
+    });
+    
     logger.info(response)
     expect(response.changed).to.equal(true);
     expect(response.stdout).to.equal("foo");
@@ -69,7 +75,13 @@ describe('DevopsTask', function() {
     var pipeline = new Pipeline();
     var devopsTask = new DevopsTask(shellHelper, pipeline);
 
-    var response = await devopsTask.start("http://192.168.0.46:6000/asp-wacala", "develop", path.join(__dirname, "real_001.yaml"));
+    var response = await devopsTask.start({
+      gitUrl: "http://192.168.0.46:6000/asp-wacala",
+      branchName: "develop",
+      yamlFullLocation: path.join(__dirname, "real_001.yaml"),
+      disableOnChageValidation: false      
+    });
+    
     expect(response.finalVariables.rawPayload.includes('"demo1" successfully started')).to.equal(true);
   }); 
 

@@ -12,6 +12,7 @@ const Entrypoint = require("../../../../main/node/Entrypoint.js");
 describe("Entrypoint - Polling", function () {
 
   var server;
+  var entrypoint;
 
   before(async () => {
 
@@ -30,6 +31,14 @@ describe("Entrypoint - Polling", function () {
   after(async () => {
     await server.close();
   });  
+
+  afterEach(async () => {
+    try {
+      await entrypoint.stop();
+    } catch (error) {
+      console.log("Failed to stop the miniops server", error)
+    }
+  });   
   
   it("should validate an invalid action", async function () {
     sinon
@@ -52,7 +61,7 @@ describe("Entrypoint - Polling", function () {
       process.stdout.write(d + "\n");
     };
 
-    var entrypoint = new Entrypoint();
+    entrypoint = new Entrypoint();
     await entrypoint.start();
 
     //restore
@@ -89,7 +98,7 @@ describe("Entrypoint - Polling", function () {
       process.stdout.write(d + "\n");
     };
 
-    var entrypoint = new Entrypoint();
+    entrypoint = new Entrypoint();
     
     //git_url parameter
     await entrypoint.start();
@@ -104,7 +113,6 @@ describe("Entrypoint - Polling", function () {
       log.slice(-1).pop().includes("git_url parameter is required")
     ).to.eq(true);
 
-    await entrypoint.stop();
     sinon.restore();
   });   
 
@@ -131,7 +139,7 @@ describe("Entrypoint - Polling", function () {
       process.stdout.write(d + "\n");
     };
 
-    var entrypoint = new Entrypoint();
+    entrypoint = new Entrypoint();
     
     //git_url parameter
     await entrypoint.start();
@@ -146,7 +154,6 @@ describe("Entrypoint - Polling", function () {
       log.slice(-1).pop().includes("git_branch parameter is required")
     ).to.eq(true);
 
-    await entrypoint.stop();
     sinon.restore();
   });    
   
@@ -174,7 +181,7 @@ describe("Entrypoint - Polling", function () {
       process.stdout.write(d + "\n");
     };
 
-    var entrypoint = new Entrypoint();
+    entrypoint = new Entrypoint();
     
     //git_url parameter
     await entrypoint.start();
@@ -186,7 +193,7 @@ describe("Entrypoint - Polling", function () {
     console.log(log);
 
     expect(
-      log.slice(-1).pop().includes("yaml_location parameter is required")
+      log.slice(-1).pop().includes("yaml_full_location parameter is required")
     ).to.eq(true);
 
     await entrypoint.stop();
@@ -203,7 +210,7 @@ describe("Entrypoint - Polling", function () {
         "--action=start",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=foo",
-        "--yaml_location=/bar.yaml"
+        "--yaml_full_location=/bar.yaml"
       ]);
 
     var initialLog = console.log;
@@ -248,7 +255,7 @@ describe("Entrypoint - Polling", function () {
         "--action=start",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
-        "--yaml_location="+path.join(__dirname, "simple.yaml"),
+        "--yaml_full_location="+path.join(__dirname, "simple.yaml"),
         "--cron_expression=*/30 * * * * *"
       ]);
 
@@ -266,9 +273,19 @@ describe("Entrypoint - Polling", function () {
 
     //force the "has not changed"
     var fileInfoLocation = path.join(os.tmpdir(), `bar-master`)
+    var miniopsInfoLocation = path.join(os.tmpdir(), `miniops.txt`)
+
+    try {
+      await fs.promises.rm(fileInfoLocation, { recursive: true });
+    } catch (error) {
+    }
+    try {
+      await fs.promises.rm(miniopsInfoLocation, { recursive: true });
+    } catch (error) {      
+    }
     await fs.promises.writeFile(fileInfoLocation, "d964d9971db23fa86b44b93c85d9691918cd0cea");
 
-    var entrypoint = new Entrypoint();
+    entrypoint = new Entrypoint();
     
     //git_url parameter
     await entrypoint.start();
@@ -295,7 +312,7 @@ describe("Entrypoint - Polling", function () {
         "--action=start",
         "--git_url=http://localhost:6000/bar",
         "--git_branch=master",
-        "--yaml_location="+path.join(__dirname, "simple.yaml"),
+        "--yaml_full_location="+path.join(__dirname, "simple.yaml"),
         "--cron_expression=*/30 * * * * *"
       ]);
 
@@ -311,17 +328,19 @@ describe("Entrypoint - Polling", function () {
       process.stdout.write(d + "\n");
     };
 
-    //force the "has not changed"
     var fileInfoLocation = path.join(os.tmpdir(), `bar-master`)
-    try {
-      await fs.promises.readFile(fileInfoLocation, "utf-8");
-      await fs.promises.rm(fileInfoLocation, { recursive: true });
-    }
-    catch (e) {    
-    }    
-    
+    var miniopsInfoLocation = path.join(os.tmpdir(), `miniops.txt`)
 
-    var entrypoint = new Entrypoint();
+    try {
+      await fs.promises.rm(fileInfoLocation, { recursive: true });
+    } catch (error) {
+    }
+    try {
+      await fs.promises.rm(miniopsInfoLocation, { recursive: true });
+    } catch (error) {      
+    }
+
+    entrypoint = new Entrypoint();
     
     //git_url parameter
     await entrypoint.start();

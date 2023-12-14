@@ -33,6 +33,8 @@ const { v4: uuidv4 } = require('uuid');
 
 function PullingStrategy(){
 
+    var jobId = "polling"
+
     this.start = async(params) => {
 
         logger.info("PullingStrategy params")
@@ -48,8 +50,8 @@ function PullingStrategy(){
             return;
         }
         
-        if(typeof params.yaml_location === 'undefined'){
-            logger.error("yaml_location parameter is required")
+        if(typeof params.yaml_full_location === 'undefined'){
+            logger.error("yaml_full_location parameter is required")
             return;
         }    
         
@@ -62,7 +64,7 @@ function PullingStrategy(){
         var pipeline = new Pipeline();
         var devopsTask = new DevopsTask(shellHelper, pipeline);
         
-        const job = schedule.scheduleJob(params.cron_expression, async function(){
+        schedule.scheduleJob(jobId, { rule: params.cron_expression }, async function(){
             var uuidExecution = uuidv4();
 
             var miniopsStatusLocation = path.join(os.tmpdir(), "miniops.txt")
@@ -96,7 +98,12 @@ function PullingStrategy(){
             }
         
             try {
-                response = await devopsTask.start(params.git_url, params.git_branch, params.yaml_location);  
+                response = await devopsTask.start({
+                    gitUrl: params.git_url,
+                    branchName: params.git_branch,
+                    yamlFullLocation: params.yaml_full_location,
+                    disableOnChageValidation: false      
+                  });  
             } catch (error) {
                 logger.error(error); 
                 logger.info(uuidExecution+ ': failed');
@@ -116,8 +123,12 @@ function PullingStrategy(){
                 await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
                 return;
             }                
-        });        
+        });
     }
+
+    this.stop = async () => {
+        schedule.cancelJob(jobId);
+    }      
 
 }
 

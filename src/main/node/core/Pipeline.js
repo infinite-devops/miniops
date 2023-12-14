@@ -33,6 +33,7 @@ function Pipeline() {
 
     this.executeFile = async (yamlFullLocation, variables) => {
 
+        logger.info("pipeline yaml: " + yamlFullLocation);
         logger.info("pipeline init variables: " + JSON.stringify(variables));
         var javascriptHelper = new JavascriptHelper();
 
