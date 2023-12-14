@@ -51,7 +51,12 @@ function PullingStrategy(){
         if(typeof params.yaml_location === 'undefined'){
             logger.error("yaml_location parameter is required")
             return;
-        }               
+        }    
+        
+        if(typeof params.cron_expression === 'undefined'){
+            logger.error("cron_expression parameter is required")
+            return;
+        }     
         
         var shellHelper = new ShellHelper();
         var pipeline = new Pipeline();
@@ -59,6 +64,7 @@ function PullingStrategy(){
         
         const job = schedule.scheduleJob(params.cron_expression, async function(){
             var uuidExecution = uuidv4();
+
             var miniopsStatusLocation = path.join(os.tmpdir(), "miniops.txt")
             var miniopsLogStatusLocation = path.join(os.tmpdir(), "miniops_log.txt")
             var miniopsStatus;

@@ -32,7 +32,7 @@ function DevopsTask(shellHelper, pipeline) {
 
     this.start = async (gitUrl, branchName, yamlFullLocation, disableOnChageValidation) => {
 
-        logger.info("job is starting...")
+        logger.info("task is starting...")
 
         if (typeof gitUrl === 'undefined') throw new Error("gitUrl is required");
         if (typeof branchName === 'undefined') throw new Error("branchName is required");
@@ -65,7 +65,7 @@ function DevopsTask(shellHelper, pipeline) {
             logger.info("currentCommitId:"+currentCommitId)
             
             if(!isFirstTime && previousCommitId===currentCommitId){
-                logger.info("git repository and branch does not have changes")
+                logger.info("branch has not changed")
                 return {changed: false}
             }
         }
@@ -82,7 +82,7 @@ function DevopsTask(shellHelper, pipeline) {
             logger.debug(e);
         }
         logger.info("deleting workspace: "+workspaceFullLocation) 
-        //await fs.promises.rm(workspaceFullLocation, { recursive: true }, () => logger.info('successfully deleted: ' + workspaceFullLocation));
+        await fs.promises.rm(workspaceFullLocation, { recursive: true }, () => logger.info('successfully deleted: ' + workspaceFullLocation));
         return {...response, changed: true}
     }; 
 

@@ -12,6 +12,7 @@ const PullingStrategy = require("./strategy/PollingStrategy.js");
 function Entrypoint() {
   const port = process.env.PORT || 2708;
   const args = argsParser(process.argv);
+  var server;
 
   this.start = async () => {
 
@@ -103,6 +104,11 @@ function Entrypoint() {
       return;
     }
 
+    if (status == "online") {
+      logger.info("miniops is already started");
+      return;
+    }  
+
     //we are in the action=start
     logger.info("miniops will start");
 
@@ -132,17 +138,22 @@ function Entrypoint() {
       res.send("miniops will be stopped in 3 seconds");
     });
 
-    var server = app.listen(port);
+    server = app.listen(port);
     await once(server, 'listening');
     logger.info(`miniops listening at http://localhost:${port}`);    
 
     //delay some seconds
     setTimeout(()=>{
+      logger.info(`miniops polling started`);   
       var pullingStrategy = new PullingStrategy();
       pullingStrategy.start(params);
-    }, 10000);
+    }, process.env.polling_initial_Delay || 1000);
     
   };
+
+  this.stop = async () => {
+    await server.close();
+  }  
 }
 
 module.exports = Entrypoint;

@@ -7,10 +7,9 @@ const path = require("path");
 const http = require("http");
 const GitServer = require("node-git-server");
 const express = require('express')
-const Entrypoint = require("../../../main/node/Entrypoint.js");
-const HttpHelper = require("../../../main/node/common/HttpHelper.js");
+const Entrypoint = require("../../../../main/node/Entrypoint.js");
 
-describe("Entrypoint", function () {
+describe("Entrypoint - Direct", function () {
 
   it("should start the direct", async function () {
     sinon
@@ -34,7 +33,6 @@ describe("Entrypoint", function () {
       })
       .listen(port);
 
-
     var entrypoint = new Entrypoint();
     var response = await entrypoint.start();
 
@@ -42,6 +40,7 @@ describe("Entrypoint", function () {
     expect(response.stdout.includes("im_a_commited_file.txt")).to.eq(true)
 
     sinon.restore();
+    await server.close();
   });  
   
   it("should validate an invalid mode", async function () {
