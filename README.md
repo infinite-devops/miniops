@@ -40,10 +40,7 @@ npm install -g https://github.com/usil/miniops.git#1.0.0-snapshot
 
 ## Yaml
 
-Similar to the yaml of gitlab, bitbucket, github actions, etc we need to create a valid yaml. You could use one of these
-
-[Yaml-templates_](https://github.com/usil/miniops/wiki/Yaml-templates_)
-
+Similar to the yaml of gitlab, bitbucket, github actions, etc we need to create a valid yaml. You could use one of [these templates](https://github.com/usil/miniops/wiki/Yaml-templates_)
 
 ## Variables
 
@@ -53,8 +50,8 @@ Similar to the yaml of gitlab, bitbucket, github actions, etc we need to create 
 set cron_expression=*/15 * * * * *
 set git_url=https://github.com/usil/asp-classic-hello-world.git
 set git_branch=develop
-set yaml_location=C:\foo\bar\acme.yaml
-set logger_level=debug
+set yaml_full_location=C:\foo\bar\acme.yaml
+set log_level=debug
 set log_file_location=C:\foo\bar\acme-devops.log
 ```
 
@@ -64,8 +61,8 @@ set log_file_location=C:\foo\bar\acme-devops.log
 export cron_expression="*/15 * * * * *"
 export git_url=https://github.com/foo/java-web-hello-world.git
 export git_branch=develop
-export yaml_location=/foo/bar/acme.yaml
-export logger_level=debug
+export yaml_full_location=/foo/bar/acme.yaml
+export log_level=debug
 export log_file_location=/foo/bar/acme-devops.log
 ```
 
@@ -116,6 +113,10 @@ npm uninstall -g miniops
 
 - clone or pull
 - start again
+
+## Advanced settings
+
+For notitifations, templates, plugins, etc go to the [wiki](https://github.com/usil/miniops/wiki)
 
 ## Acknowledgments
 

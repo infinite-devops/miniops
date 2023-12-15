@@ -17,7 +17,7 @@ function Entrypoint() {
 
   this.start = async () => {
 
-    logger.init({loggerFileLocation: process.env.log_file_location, loggerLevel: process.env.logger_level});
+    logger.init({loggerFileLocation: process.env.log_file_location, loggerLevel: process.env.log_level});
 
     logger.info("arguments");
     logger.info(args);
@@ -35,7 +35,7 @@ function Entrypoint() {
       smtpUser: args.smtp_user,
       smtpPassword: args.smtp_password,
       smtpSecure: args.smtp_secure,
-      rejectUnauthorized: args.smt_reject_unauthorized,
+      rejectUnauthorized: args.smtp_reject_unauthorized,
       from: args.smtp_from
     };
 

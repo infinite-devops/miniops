@@ -27,6 +27,7 @@ const ShellHelper = require('../common/ShellHelper.js');
 const StringHelper = require('../common/StringHelper.js');
 const JavascriptHelper = require('../common/JavascriptHelper.js');
 const MailService = require("../service/MailService.js");
+const HtmlHelper = require('../common/HtmlHelper.js');
 const yaml = require('js-yaml');
 const fs = require('fs');
 
@@ -37,6 +38,7 @@ function Pipeline() {
     this.executeFile = async (yamlFullLocation, variables, notificationSettings, uuidExecution) => {
 
         const mailService = new MailService();
+        const htmlHelper = new HtmlHelper();
 
         logger.info("pipeline yaml: " + yamlFullLocation);
         logger.info("pipeline init variables: " + JSON.stringify(variables));
@@ -49,7 +51,7 @@ function Pipeline() {
             throw ErrorHelper.reThrow(`Failed to read yaml: ${yamlFullLocation}`, err)
         }
 
-        if(notificationSettings && notificationSettings.smtpHost && notificationSettings.smtpPort && notificationSettings.smtpUser && notificationSettings.smtpPassword && notificationSettings.smtpSecure && notificationSettings.rejectUnauthorized && notificationSettings.from && yamlInstance.parameters.notificationRecipients){
+        if(notificationSettings && notificationSettings.smtpHost && notificationSettings.smtpPort && notificationSettings.smtpUser && notificationSettings.smtpPassword && notificationSettings.smtpSecure && notificationSettings.rejectUnauthorized && notificationSettings.from && yamlInstance.notification && yamlInstance.notification.recipients){
             mailService.initialize({
                 smtpHost: notificationSettings.smtpHost,
                 smtpPort: notificationSettings.smtpPort,
@@ -59,23 +61,23 @@ function Pipeline() {
                 rejectUnauthorized: notificationSettings.rejectUnauthorized,
                 from: notificationSettings.from
               });
-              mailNotificactionIsEnabled = false;              
+              mailNotificactionIsEnabled = true;              
         }
 
         if(mailNotificactionIsEnabled===true){
-            mailService.sendMail({
-                to: yamlInstance.parameters.notificationRecipients,
-                subject: `Build #${uuidExecution}: ${repositoryName} - started`,
-                html: "new build for ${repositoryName}: ${uuidExecution} - started",
+            await mailService.sendMail({
+                to: yamlInstance.notification.recipients,
+                subject: `Build #${uuidExecution}: ${variables.repositoryName} - started`,
+                html: `New build ${uuidExecution} for ${variables.repositoryName} has started`,
               });
         }
 
         var shellHelper = new ShellHelper();
         var response = {}, currentStepKey;
-        var globalVariables = { ...yamlInstance.parameters }
+        var globalVariables = { ...yamlInstance.notification }
         for (var stepKey in yamlInstance.steps) {
             currentStepKey = stepKey;
-            logger.info(stepKey)
+            logger.info(`step: ${currentStepKey}`)
             globalVariables = { ...globalVariables, ...variables }
 
             var script = yamlInstance.steps[stepKey].script;
@@ -101,6 +103,7 @@ function Pipeline() {
                     logger.debug(functionReturn)
                     if(typeof functionReturn === 'boolean'){
                         if (functionReturn===false) {
+                            logger.info(`step: ${currentStepKey} - failed`)
                             logger.info(`code returned false value which means an error`);
                             if(typeof skip_error === 'undefined' || skip_error===false){
                                 break;
@@ -128,6 +131,7 @@ function Pipeline() {
                 logger.debug("script response")
                 logger.debug(response)
                 if (response.code != 0) {
+                    logger.info(`step: ${currentStepKey} - failed`)
                     logger.info(`script returned a nonzero exit value which means an error`);
                     if(typeof skip_error === 'undefined' || skip_error===false){
                         break;
@@ -142,13 +146,30 @@ function Pipeline() {
                 logger.debug(parsedVariables)
                 globalVariables = { ...parsedVariables, ...globalVariables, rawPayload: response.rawPayload }
             }
+
+            var stepStatus = response.code===0 ? "success" : "failed";
+            logger.info(`step: ${currentStepKey} - ${stepStatus}`)
+        }
+
+        var status = response.code===0 ? "success" : "failed";
+        if(status==="failed"){
+            logger.error(response)
         }
 
         if(mailNotificactionIsEnabled===true){
-            mailService.sendMail({
-                to: yamlInstance.parameters.notificationRecipients,
-                subject: `Build #${uuidExecution}: ${repositoryName} - ${response.code}`,
-                html: `Build #${uuidExecution}: ${repositoryName} - ${response.code}`
+            
+            var safeResponse = {...response};
+            delete safeResponse.variables;
+            delete safeResponse.fullStackTraceErr;
+            //safeResponse.fullStackTraceErr = fullStackTraceErr.toString();
+            var table = htmlHelper.createTableFromObject(safeResponse);
+            var body = response.code===0 ? "All the steps were executed successfully" : 
+                "At least one step thrown an error. Check the logs or contact the administrator: <br><br>"+ table;
+
+            await mailService.sendMail({
+                to: yamlInstance.notification.recipients,
+                subject: `Build #${uuidExecution}: ${variables.repositoryName} - ${status}`,
+                html: body
               });
         }
 
