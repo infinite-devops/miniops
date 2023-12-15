@@ -21,41 +21,28 @@
  *   SOFTWARE.
  */
 
+// https://stackoverflow.com/questions/32596102/node-js-cancel-settimeout-from-an-event
+
 const logger = require('../common/Logger.js');
 const DevopsTask = require('../core/DevopsTask.js');
 const ShellHelper = require('../common/ShellHelper.js');
 const Pipeline = require('../core/Pipeline.js');
-const schedule = require('node-schedule');
+var cron = require('cron');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+var cronParser = require('cron-parser');
 
-function PullingStrategy(){
+function PollingStrategy(){
 
-    var jobId = "polling"
+    var timer;
 
-    this.start = async(params) => {
+    this.start = async(devopsSettings, notificationSettings) => {
 
-        logger.info("PullingStrategy params")
-        logger.info(params)
+        logger.info("PullingStrategy starting")
 
-        if(typeof params.git_url === 'undefined'){
-            logger.error("git_url parameter is required")
-            return;
-        }
-
-        if(typeof params.git_branch === 'undefined'){
-            logger.error("git_branch parameter is required")
-            return;
-        }
-        
-        if(typeof params.yaml_full_location === 'undefined'){
-            logger.error("yaml_full_location parameter is required")
-            return;
-        }    
-        
-        if(typeof params.cron_expression === 'undefined'){
+        if(typeof devopsSettings.cronExpression === 'undefined'){
             logger.error("cron_expression parameter is required")
             return;
         }     
@@ -63,73 +50,31 @@ function PullingStrategy(){
         var shellHelper = new ShellHelper();
         var pipeline = new Pipeline();
         var devopsTask = new DevopsTask(shellHelper, pipeline);
-        
-        schedule.scheduleJob(jobId, { rule: params.cron_expression }, async function(){
-            var uuidExecution = uuidv4();
 
-            var miniopsStatusLocation = path.join(os.tmpdir(), "miniops.txt")
-            var miniopsLogStatusLocation = path.join(os.tmpdir(), "miniops_log.txt")
-            var miniopsStatus;
-            try {
-                miniopsStatus = await fs.promises.readFile(miniopsStatusLocation, "utf-8");
+        var interval = cronParser.parseExpression(devopsSettings.cronExpression);
+        var lossDuringItereation = 500;
+        var first = true;
+        async function polling() {
+          if(first===true){
+            first = false;
+            devopsTask.start(devopsSettings, notificationSettings);  
+          }else{            
+            var now = new Date();
+            var next = interval.next();
+            if((next.getTime()-now.getTime())< lossDuringItereation){
+              devopsTask.start(devopsSettings, notificationSettings);  
             }
-            catch (e) {
-                logger.debug(e);
-            }
-        
-            if(typeof miniopsStatus !== 'undefined' && miniopsStatus.startsWith("in-progress")){
-                logger.info(`Another job is in progress ${miniopsStatus}. To force the execution, delete this file: "`+
-                    miniopsStatusLocation)
-                return;
-            }
-
-            logger.info('\n');
-            logger.info(uuidExecution+ ': starting');
-            
-            try {
-                await fs.promises.writeFile(miniopsStatusLocation, "in-progress : "+uuidExecution);
-            }
-            catch (error) {
-                logger.error(error); 
-                logger.info(uuidExecution+ ': failed');
-                await fs.promises.writeFile(miniopsStatusLocation, "failed : "+uuidExecution);
-                await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
-                return;
-            }
-        
-            try {
-                response = await devopsTask.start({
-                    gitUrl: params.git_url,
-                    branchName: params.git_branch,
-                    yamlFullLocation: params.yaml_full_location,
-                    disableOnChageValidation: false      
-                  });  
-            } catch (error) {
-                logger.error(error); 
-                logger.info(uuidExecution+ ': failed');
-                await fs.promises.writeFile(miniopsStatusLocation, "failed : "+uuidExecution);
-                await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
-                return;
-            }
-        
-            try {
-                await fs.promises.writeFile(miniopsStatusLocation, response.code==0?"completed : "+uuidExecution: "failed : "+uuidExecution);
-                logger.info(uuidExecution+ ': completed');
-            }
-            catch (error) {
-                logger.error(error); 
-                logger.info(uuidExecution+ ': failed');
-                await fs.promises.writeFile(miniopsStatusLocation, "failed : "+uuidExecution);
-                await fs.promises.writeFile(miniopsLogStatusLocation, error.toString());
-                return;
-            }                
-        });
+          }
+          timer = setTimeout(polling, lossDuringItereation);
+        }
+      
+        polling();
     }
 
     this.stop = async () => {
-        schedule.cancelJob(jobId);
+        if(timer) clearTimeout(timer);
     }      
 
 }
 
-module.exports = PullingStrategy;
+module.exports = PollingStrategy;

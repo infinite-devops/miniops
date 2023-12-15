@@ -22,11 +22,21 @@ function Entrypoint() {
     logger.info("arguments");
     logger.info(args);
 
-    var params = {
-      git_url: process.env.git_url || args.git_url,
-      git_branch: process.env.git_branch || args.git_branch,
-      yaml_full_location: process.env.yaml_full_location || args.yaml_full_location,
-      cron_expression: process.env.cron_expression || args.cron_expression,
+    var devopsSettings = {
+      gitUrl: process.env.git_url || args.git_url,
+      branchName: process.env.git_branch || args.git_branch,
+      yamlFullLocation: process.env.yaml_full_location || args.yaml_full_location,
+      cronExpression: process.env.cron_expression || args.cron_expression,
+    };
+
+    var notificationSettings = {
+      smtpHost: args.smtp_host,
+      smtpPort: args.smtp_port,
+      smtpUser: args.smtp_user,
+      smtpPassword: args.smtp_password,
+      smtpSecure: args.smtp_secure,
+      rejectUnauthorized: args.smt_reject_unauthorized,
+      from: args.smtp_from
     };
 
     logger.info('mode: '+args.mode);
@@ -41,12 +51,9 @@ function Entrypoint() {
       var pipeline = new Pipeline();
       var devopsTask = new DevopsTask(shellHelper, pipeline);
 
-      response = await devopsTask.start({
-        gitUrl: params.git_url,
-        branchName: params.git_branch,
-        yamlFullLocation: params.yaml_full_location,
+      response = await devopsTask.start({...devopsSettings,
         disableOnChageValidation: true      
-      });
+      },notificationSettings, uuidExecution);
       logger.info("completed: "+uuidExecution)      
       logger.info(response.code==0?"completed : "+uuidExecution: "failed : "+uuidExecution)
       return response;
@@ -111,8 +118,6 @@ function Entrypoint() {
     }  
 
     //we are in the action=start
-    logger.info("miniops will start");
-
     var app = express();
 
     app.get("/manage/status", function (req, res) {
@@ -146,13 +151,13 @@ function Entrypoint() {
     //delay some seconds
     logger.info(`miniops polling started`);   
     pullingStrategy = new PullingStrategy();
-    pullingStrategy.start(params);
+    pullingStrategy.start(devopsSettings, notificationSettings);
     
   };
 
   this.stop = async () => {
-    await server.close();
-    await pullingStrategy.stop();
+    if(server) await server.close();
+    if(pullingStrategy) await pullingStrategy.stop();
   }  
 }
 

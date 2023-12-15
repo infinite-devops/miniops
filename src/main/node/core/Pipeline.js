@@ -26,12 +26,17 @@ const ErrorHelper = require('../common/ErrorHelper.js');
 const ShellHelper = require('../common/ShellHelper.js');
 const StringHelper = require('../common/StringHelper.js');
 const JavascriptHelper = require('../common/JavascriptHelper.js');
+const MailService = require("../service/MailService.js");
 const yaml = require('js-yaml');
 const fs = require('fs');
 
 function Pipeline() {
 
-    this.executeFile = async (yamlFullLocation, variables) => {
+    var mailNotificactionIsEnabled = false;
+
+    this.executeFile = async (yamlFullLocation, variables, notificationSettings, uuidExecution) => {
+
+        const mailService = new MailService();
 
         logger.info("pipeline yaml: " + yamlFullLocation);
         logger.info("pipeline init variables: " + JSON.stringify(variables));
@@ -42,6 +47,27 @@ function Pipeline() {
             yamlInstance = await yaml.load(await fs.promises.readFile(yamlFullLocation, 'utf8'));
         } catch (err) {
             throw ErrorHelper.reThrow(`Failed to read yaml: ${yamlFullLocation}`, err)
+        }
+
+        if(notificationSettings && notificationSettings.smtpHost && notificationSettings.smtpPort && notificationSettings.smtpUser && notificationSettings.smtpPassword && notificationSettings.smtpSecure && notificationSettings.rejectUnauthorized && notificationSettings.from && yamlInstance.parameters.notificationRecipients){
+            mailService.initialize({
+                smtpHost: notificationSettings.smtpHost,
+                smtpPort: notificationSettings.smtpPort,
+                smtpUser: notificationSettings.smtpUser,
+                smtpPassword: notificationSettings.smtpPassword,
+                smtpSecure: notificationSettings.smtpSecure,
+                rejectUnauthorized: notificationSettings.rejectUnauthorized,
+                from: notificationSettings.from
+              });
+              mailNotificactionIsEnabled = false;              
+        }
+
+        if(mailNotificactionIsEnabled===true){
+            mailService.sendMail({
+                to: yamlInstance.parameters.notificationRecipients,
+                subject: `Build #${uuidExecution}: ${repositoryName} - started`,
+                html: "new build for ${repositoryName}: ${uuidExecution} - started",
+              });
         }
 
         var shellHelper = new ShellHelper();
@@ -117,6 +143,15 @@ function Pipeline() {
                 globalVariables = { ...parsedVariables, ...globalVariables, rawPayload: response.rawPayload }
             }
         }
+
+        if(mailNotificactionIsEnabled===true){
+            mailService.sendMail({
+                to: yamlInstance.parameters.notificationRecipients,
+                subject: `Build #${uuidExecution}: ${repositoryName} - ${response.code}`,
+                html: `Build #${uuidExecution}: ${repositoryName} - ${response.code}`
+              });
+        }
+
         return { ...response, finalVariables: globalVariables };
     }
 
