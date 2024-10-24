@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+const Entrypoint = require('../src/main/node/Entrypoint.js')
+var entrypoint = new Entrypoint();
+entrypoint.start();

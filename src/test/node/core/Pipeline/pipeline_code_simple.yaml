@@ -1,0 +1,6 @@
+steps:
+  aaaa: 
+    code: return {foo:(1 + 1)}
+  bbbb: 
+    code: |
+      return { bar: params.foo +1}

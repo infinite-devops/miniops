@@ -1,0 +1,9 @@
+parameters:
+  appName : bar
+
+steps:
+  download: 
+    script: |
+        git clone $gitUrl -b $branchName $workspaceFullLocation
+  validate: 
+    script: ls -la "$workspaceFullLocation"

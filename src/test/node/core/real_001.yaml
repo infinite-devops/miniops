@@ -1,0 +1,60 @@
+parameters:
+  iisSiteName : demo1
+  iisSiteFullLocation: C:\sites\demo1
+  iisSiteHttpPort: 8083
+  iisHomeFullLocation : '%systemroot%\system32\inetsrv\'
+
+steps:
+  start: 
+    script: echo %workspaceFullLocation%
+  download: 
+    script: |
+        git clone %gitUrl% -b %branchName% %workspaceFullLocation%
+        dir /a /b %workspaceFullLocation%
+  get-app-information: 
+    script: |
+      echo off
+      SET PATH=%PATH%;%systemroot%\system32\inetsrv\
+      REM due to appcmd in case of error doesn't return a stdout
+      REM we need this catch
+      REM also due to the last block is parsed by tiny devops and
+      REM the success path needs a statement, we use echo. to perform
+      REM a new line
+      appcmd list site /name:"%iisSiteName%" && (
+        echo.
+      ) || (
+        echo state:Unknown
+      )      
+    skip_error: true  
+  parse-iis-status: 
+    code: |
+      try{
+        status = /state:[^\)]+/.exec(params.rawPayload)[0].split(":")[1].replace(/$\"/g,"");
+      }catch(err){
+        status="Unknown"
+      }
+      return { iisSiteStatus : status }      
+  deploy: 
+    script: |
+      echo off
+      SET PATH=%PATH%;%systemroot%\system32\inetsrv\
+
+      IF "%iisSiteStatus%"=="Started" (
+        appcmd stop site /site.name:%iisSiteName%
+        SET iisSiteStatus=Stopped
+      )
+
+      IF EXIST "%iisSiteFullLocation%" (
+        rmdir /s /q "%iisSiteFullLocation%"
+      )
+
+      mkdir "%iisSiteFullLocation%"
+      xcopy /s /q "%workspaceFullLocation%" "%iisSiteFullLocation%"
+
+      IF "%iisSiteStatus%"=="Unknown" (
+        appcmd add site /name:%iisSiteName% /bindings:http://*:%iisSiteHttpPort% /physicalpath:"%iisSiteFullLocation%"
+      ) ELSE IF "%iisSiteStatus%"=="Stopped" (
+        appcmd start site /site.name:%iisSiteName%
+      ) ELSE (
+        echo "unsuported status: %iisSiteStatus%"
+      ) 

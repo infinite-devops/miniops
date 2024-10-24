@@ -1,0 +1,6 @@
+steps:
+  aaaa: 
+    script: csharp is a xit
+    skip_error: true
+  bbb: 
+    script: date

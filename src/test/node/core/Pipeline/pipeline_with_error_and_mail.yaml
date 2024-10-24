@@ -1,0 +1,8 @@
+notification:
+  recipients: jane@mail.com
+
+steps:
+  step_1: 
+    script: date
+  step_2: 
+    script: foo
